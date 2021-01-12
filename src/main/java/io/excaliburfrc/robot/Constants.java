@@ -10,7 +10,12 @@ package io.excaliburfrc.robot;
  */
 public final class Constants {
   // add a inner class `public static final class` for each subsystem.
-
+  public static final class DriveConstants {
+    public static final int RIGHT_LEADER_ID = 1;
+    public static final int RIGHT_FOLLOWER_ID = 2;
+    public static final int LEFT_LEADER_ID = 3;
+    public static final int LEFT_FOLLOWER_ID = 4;
+  }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
 
