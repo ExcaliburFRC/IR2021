@@ -11,35 +11,35 @@ import io.excaliburfrc.robot.subsystems.Drivetrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems, as `public final`
-    public final Drivetrain drivetrain = new Drivetrain();
+  // The robot's subsystems, as `public final`
+  public final Drivetrain drivetrain = new Drivetrain();
 
-    private final Joystick driveJoystick = new Joystick(0);
-    private final Joystick armJoystick = new Joystick(1);
+  private final Joystick driveJoystick = new Joystick(0);
+  private final Joystick armJoystick = new Joystick(1);
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Configure the button bindings
-        configureButtonBindings();
-    }
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    // Configure the button bindings
+    configureButtonBindings();
+  }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
-     * {@link JoystickButton}.
-     */
-    private void configureButtonBindings() {
-        drivetrain.setDefaultCommand(
-                new RunCommand(
-                        () -> {
-                            drivetrain.arcade(driveJoystick.getRawAxis(1), driveJoystick.getRawAxis(2));
-                        }));
-        // create `JoystickButton`s binding between the buttons and commands.
-        // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
-        // DO NOT CREATE MORE JOYSTICKS! or rename them
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
+   * {@link JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    drivetrain.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              drivetrain.arcade(driveJoystick.getRawAxis(1), driveJoystick.getRawAxis(2));
+            },
+            drivetrain));
 
-    }
+    // create `JoystickButton`s binding between the buttons and commands.
+    // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
+    // DO NOT CREATE MORE JOYSTICKS! or rename them
+
+  }
 }

@@ -18,6 +18,8 @@ public class Drivetrain extends SubsystemBase {
   private CANSparkMax leftLeader;
   private CANSparkMax leftFollower;
   private CANEncoder leftEncoder;
+  private CANEncoder rightEncoder;
+
   private DifferentialDrive drive;
 
   public Drivetrain() {
@@ -26,9 +28,18 @@ public class Drivetrain extends SubsystemBase {
     leftFollower = new CANSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     rightFollower = new CANSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     leftEncoder = leftLeader.getAlternateEncoder(TPS);
+    rightEncoder = rightLeader.getAlternateEncoder(TPS);
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
     drive = new DifferentialDrive(leftLeader, rightLeader);
+  }
+
+  public double getLeftEncoder() {
+    return leftEncoder.getPosition();
+  }
+
+  public double getRightEncoder() {
+    return rightEncoder.getPosition();
   }
 
   public void tankDrive(double left, double right) {
