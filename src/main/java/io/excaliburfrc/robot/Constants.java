@@ -15,6 +15,7 @@ public final class Constants {
     public static final int FORWARD_CHANNEL = 0;
     public static final int REVERSE_CHANNEL = 1;
   }
+
   public static final class DriveConstants {
     public static final int RIGHT_LEADER_ID = 11;
     public static final int RIGHT_FOLLOWER_ID = 12;

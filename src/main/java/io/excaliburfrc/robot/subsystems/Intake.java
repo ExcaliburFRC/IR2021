@@ -5,14 +5,15 @@ import static io.excaliburfrc.robot.Constants.intakeConstans.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake {
+public class Intake extends SubsystemBase {
   private CANSparkMax intakeMotor;
   private DoubleSolenoid piston;
 
   public Intake() {
     intakeMotor = new CANSparkMax(INTAKE_MOTOR_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    DoubleSolenoid piston = new DoubleSolenoid(FORWARD_CHANNEL, REVERSE_CHANNEL);
+    piston = new DoubleSolenoid(FORWARD_CHANNEL, REVERSE_CHANNEL);
   }
 
   public enum Mode {
