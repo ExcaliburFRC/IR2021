@@ -1,6 +1,8 @@
 package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import io.excaliburfrc.robot.subsystems.Drivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class RobotContainer {
   // The robot's subsystems, as `public final`
+  public final Drivetrain drivetrain = new Drivetrain();
 
   private final Joystick driveJoystick = new Joystick(0);
   private final Joystick armJoystick = new Joystick(1);
@@ -27,6 +30,13 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    drivetrain.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              drivetrain.arcade(driveJoystick.getRawAxis(1), driveJoystick.getRawAxis(2));
+            },
+            drivetrain));
+
     // create `JoystickButton`s binding between the buttons and commands.
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
     // DO NOT CREATE MORE JOYSTICKS! or rename them
