@@ -27,9 +27,8 @@ public final class Constants {
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
 
-    public static final Shooter{
-        public static final int SHOOTER_ID = 1;
-        public static final int SHOOTER_SPEED;
+    public static final class ShooterConstants {
+        public static final int SHOOTER_ID = 13;
     }
 
   public static final class TransporterConstants {

@@ -1,6 +1,9 @@
 package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import io.excaliburfrc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
@@ -17,6 +20,7 @@ import io.excaliburfrc.robot.subsystems.Transporter;
 public class RobotContainer {
   // The robot's subsystems, as `public final`
   public final Intake intake = new Intake();
+  private final Shooter shooter = new Shooter();
   public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
 
@@ -56,6 +60,13 @@ public class RobotContainer {
     // create `JoystickButton`s binding between the buttons and commands.
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
     // DO NOT CREATE MORE JOYSTICKS! or rename them
+    new JoystickButton(armJoystick, 4)
+            .whenPressed(()->{
+              shooter.start(Shooter.ShooterSpeed.HIGH);
+            }, shooter)
+            .whenReleased(()->{
+              shooter.stop();
+            }, shooter);
     final JoystickButton in = new JoystickButton(armJoystick, 1);
     final JoystickButton out = new JoystickButton(armJoystick, 2);
 
