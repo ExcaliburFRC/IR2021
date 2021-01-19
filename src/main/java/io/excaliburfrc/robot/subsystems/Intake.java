@@ -35,4 +35,6 @@ public class Intake extends SubsystemBase {
       intakeMotor.set(Mode.OFF.speed);
     }
   }
+  public static void stop(){
+    intakeMotor.set(io.excaliburfrc.robot.subsystems.Intake.Mode.OFF);
 }
