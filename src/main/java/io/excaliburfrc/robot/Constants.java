@@ -16,6 +16,7 @@ public final class Constants {
     public static final int LEFT_LEADER_ID = 3;
     public static final int LEFT_FOLLOWER_ID = 4;
     public static final int TPS = 2046;
+    public static final int TRACK_WIDTH = 60;
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
