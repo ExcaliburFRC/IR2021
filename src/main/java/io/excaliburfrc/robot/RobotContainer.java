@@ -45,6 +45,7 @@ public class RobotContainer {
               intake.stop();
             },
             intake);
+
     new JoystickButton(armJoystick, 4)
         .whenPressed(
             () -> {
@@ -54,18 +55,6 @@ public class RobotContainer {
         .whenReleased(
             () -> {
               intake.lowerPisto();
-            },
-            intake);
-
-    new JoystickButton(armJoystick, 4)
-        .whenPressed(
-            () -> {
-              intake.openPiston();
-            },
-            intake)
-        .whenReleased(
-            () -> {
-              intake.closePiston();
             },
             intake);
 
