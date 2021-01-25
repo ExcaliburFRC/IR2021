@@ -29,7 +29,11 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int SHOOTER_ID = 41;
-  }public static final class TransporterConstants {
+    public static final double TOLERANCE = 100; // TODO: tune
+    public static final double GEARING = 3; // TODO: tune
+  }
+
+  public static final class TransporterConstants {
     public static final int FLICKER_ID = 33;
     public static final int LOADING_ID = 32;
     public static final int LIMIT = 20;

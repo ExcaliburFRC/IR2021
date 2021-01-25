@@ -1,11 +1,10 @@
 package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import io.excaliburfrc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
+import io.excaliburfrc.robot.subsystems.Shooter;
 import io.excaliburfrc.robot.subsystems.Intake;
 import io.excaliburfrc.robot.subsystems.Intake.Mode;
 import io.excaliburfrc.robot.subsystems.Transporter;
@@ -68,7 +67,8 @@ public class RobotContainer {
         .whenReleased(
             () -> {
               shooter.stop();
-            }, shooter);
+            },
+            shooter);
     final JoystickButton in = new JoystickButton(armJoystick, 1);
     final JoystickButton out = new JoystickButton(armJoystick, 2);
 
@@ -96,8 +96,6 @@ public class RobotContainer {
           transporter.setLoading(Transporter.Mode.OFF);
         },
         transporter);
-            },
-            shooter);
   }
 
   private void initSubsystemStates() {
