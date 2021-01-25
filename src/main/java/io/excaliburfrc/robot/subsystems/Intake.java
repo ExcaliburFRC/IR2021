@@ -1,6 +1,6 @@
 package io.excaliburfrc.robot.subsystems;
 
-import static io.excaliburfrc.robot.Constants.intakeConstans.*;
+import static io.excaliburfrc.robot.Constants.IntakeConstants.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -27,14 +27,22 @@ public class Intake extends SubsystemBase {
 
     public final double speed;
   }
+  public void raisePisto(){
+    piston.set(DoubleSolenoid.Value.kForward);
+  }
+  public void lowerPisto(){
+    piston.set(DoubleSolenoid.Value.kReverse);
+  }
 
-  public void intake(Mode speed) {
+  public void activate(Mode speed) {
     if (piston.get() == DoubleSolenoid.Value.kReverse) {
-      intakeMotor.set(speed.speed);
-    } else {
       intakeMotor.set(Mode.OFF.speed);
+    } else {
+      intakeMotor.set(speed.speed);
     }
   }
-  public static void stop(){
-    intakeMotor.set(io.excaliburfrc.robot.subsystems.Intake.Mode.OFF);
+
+  public void stop() {
+    intakeMotor.set(Mode.OFF.speed);
+  }
 }

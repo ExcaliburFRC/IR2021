@@ -3,6 +3,7 @@ package io.excaliburfrc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import io.excaliburfrc.robot.subsystems.Intake;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import io.excaliburfrc.robot.subsystems.Transporter;
 
@@ -14,6 +15,7 @@ import io.excaliburfrc.robot.subsystems.Transporter;
  */
 public class RobotContainer {
   // The robot's subsystems, as `public final`
+  public final Intake intake = new Intake();
   public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
 
@@ -28,11 +30,33 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
-   * {@link JoystickButton}.
+   * instantiating a {@link } or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+   * {@link }), and then calling passing it to a {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(armJoystick, 3)
+        .whenPressed(
+            () -> {
+              intake.activate(Intake.Mode.IN);
+            },
+            intake)
+        .whenReleased(
+            () -> {
+              intake.stop();
+            },
+            intake);
+      new JoystickButton(armJoystick, 4)
+              .whenPressed(
+                      () -> {
+                          intake.raisePisto();
+                      },
+                      intake)
+              .whenReleased(
+                      () -> {
+                          intake.lowerPisto();
+                      },
+                      intake);
+
     drivetrain.setDefaultCommand(
         new RunCommand(
             () -> {
