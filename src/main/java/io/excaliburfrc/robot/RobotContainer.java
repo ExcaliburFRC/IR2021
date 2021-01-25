@@ -45,17 +45,17 @@ public class RobotContainer {
               intake.stop();
             },
             intake);
-      new JoystickButton(armJoystick, 4)
-              .whenPressed(
-                      () -> {
-                          intake.raisePisto();
-                      },
-                      intake)
-              .whenReleased(
-                      () -> {
-                          intake.lowerPisto();
-                      },
-                      intake);
+    new JoystickButton(armJoystick, 4)
+        .whenPressed(
+            () -> {
+              intake.raisePisto();
+            },
+            intake)
+        .whenReleased(
+            () -> {
+              intake.lowerPisto();
+            },
+            intake);
 
     new JoystickButton(armJoystick, 4)
         .whenPressed(

@@ -27,10 +27,12 @@ public class Intake extends SubsystemBase {
 
     public final double speed;
   }
-  public void raisePisto(){
+
+  public void raisePisto() {
     piston.set(DoubleSolenoid.Value.kForward);
   }
-  public void lowerPisto(){
+
+  public void lowerPisto() {
     piston.set(DoubleSolenoid.Value.kReverse);
   }
 
