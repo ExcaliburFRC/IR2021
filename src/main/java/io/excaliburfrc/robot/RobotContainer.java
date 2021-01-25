@@ -57,6 +57,18 @@ public class RobotContainer {
                       },
                       intake);
 
+    new JoystickButton(armJoystick, 4)
+        .whenPressed(
+            () -> {
+              intake.openPiston();
+            },
+            intake)
+        .whenReleased(
+            () -> {
+              intake.closePiston();
+            },
+            intake);
+
     drivetrain.setDefaultCommand(
         new RunCommand(
             () -> {

@@ -34,6 +34,14 @@ public class Intake extends SubsystemBase {
     piston.set(DoubleSolenoid.Value.kReverse);
   }
 
+  public void openPiston() {
+    piston.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void closePiston() {
+    piston.set(DoubleSolenoid.Value.kForward);
+  }
+
   public void activate(Mode speed) {
     if (piston.get() == DoubleSolenoid.Value.kReverse) {
       intakeMotor.set(Mode.OFF.speed);
