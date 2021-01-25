@@ -2,8 +2,8 @@ package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import io.excaliburfrc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import io.excaliburfrc.robot.subsystems.Drivetrain;
 import io.excaliburfrc.robot.subsystems.Transporter;
 
 /**
