@@ -28,7 +28,7 @@ public final class Constants {
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
 
   public static final class ShooterConstants {
-    public static final int SHOOTER_ID = 13;
+    public static final int SHOOTER_ID = 41;
   }public static final class TransporterConstants {
     public static final int FLICKER_ID = 33;
     public static final int LOADING_ID = 32;
