@@ -28,11 +28,6 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link } or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
-   * {@link }), and then calling passing it to a {@link JoystickButton}.
-   */
   private void configureButtonBindings() {
     new JoystickButton(armJoystick, 3)
         .whenPressed(
@@ -49,12 +44,13 @@ public class RobotContainer {
     new JoystickButton(armJoystick, 4)
         .whenPressed(
             () -> {
-              intake.raisePisto();
+              intake.raise();
             },
-            intake)
-        .whenReleased(
+            intake);
+    new JoystickButton(armJoystick, 5)
+        .whenPressed(
             () -> {
-              intake.lowerPisto();
+              intake.lower();
             },
             intake);
 
