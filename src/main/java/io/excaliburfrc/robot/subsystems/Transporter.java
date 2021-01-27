@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Transporter extends SubsystemBase {
   private final WPI_VictorSPX flicker, loading;
-  private ColorSensorV3 ballDetector;
+  private final ColorSensorV3 ballDetector;
 
   public Transporter() {
     flicker = new WPI_VictorSPX(FLICKER_ID);
@@ -19,23 +19,26 @@ public class Transporter extends SubsystemBase {
   }
 
   public enum Mode {
-    IN(0.6),
-    OUT(-0.4),
-    OFF(0);
+    SHOOT(0.6, 0.5),
+    IN(0.6, 0.5),
+    OUT(-0.4, -0.3),
+    OFF(0, 0);
 
-    Mode(double i) {
-      speed = i;
+    Mode(double fl, double ld) {
+      flicker = fl;
+      loading = ld;
     }
 
-    public final double speed;
+    public final double flicker, loading;
   }
 
-  public void setFlicker(Mode speed) {
-    flicker.set(ControlMode.PercentOutput, speed.speed);
-  }
-
-  public void setLoading(Mode speed) {
-    loading.set(ControlMode.PercentOutput, speed.speed);
+  public void activate(Mode mode) {
+    // if intaking, don't let the ball pass the sensor
+    if (mode == Mode.IN && isBallReady()) {
+      mode = Mode.OFF;
+    }
+    flicker.set(ControlMode.PercentOutput, mode.flicker);
+    loading.set(ControlMode.PercentOutput, mode.loading);
   }
 
   public boolean isBallReady() {
