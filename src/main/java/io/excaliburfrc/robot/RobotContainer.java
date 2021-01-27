@@ -54,10 +54,11 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(
         new RunCommand(
-            () ->
-                drivetrain.arcade(
-                    driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis)),
+            () -> {
+              drivetrain.arcade(
+                  driveJoystick.getRawAxis(forwardDriveAxis),
+                  driveJoystick.getRawAxis(rotateDriveAxis));
+            },
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
