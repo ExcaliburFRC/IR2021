@@ -10,6 +10,12 @@ package io.excaliburfrc.robot;
  */
 public final class Constants {
   // add a inner class `public static final class` for each subsystem.
+  public static final class IntakeConstants {
+    public static final int INTAKE_MOTOR_ID = 60;
+    public static final int FORWARD_CHANNEL = 1;
+    public static final int REVERSE_CHANNEL = 0;
+  }
+
   public static final class DriveConstants {
     public static final int RIGHT_LEADER_ID = 11;
     public static final int RIGHT_FOLLOWER_ID = 12;
