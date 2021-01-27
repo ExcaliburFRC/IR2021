@@ -3,18 +3,18 @@ package io.excaliburfrc.robot.subsystems;
 import static io.excaliburfrc.robot.Constants.TransporterConstants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Transporter extends SubsystemBase {
-  private VictorSPX flicker, loading;
+  private final WPI_VictorSPX flicker, loading;
   private ColorSensorV3 ballDetector;
 
   public Transporter() {
-    flicker = new VictorSPX(FLICKER_ID);
-    loading = new VictorSPX(LOADING_ID);
+    flicker = new WPI_VictorSPX(FLICKER_ID);
+    loading = new WPI_VictorSPX(LOADING_ID);
     ballDetector = new ColorSensorV3(I2C.Port.kOnboard);
   }
 

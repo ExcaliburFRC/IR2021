@@ -19,7 +19,6 @@ public class SimSparkMax extends CANSparkMax {
   public SimSparkMax(int deviceID, MotorType type) {
     super(deviceID, type);
     if (RobotBase.isSimulation()) {
-      //      var devices =
       simappliedOutput =
           new SimDeviceSim("SPARK MAX [" + deviceID + "]").getDouble("Applied Output");
     } else simappliedOutput = null;
