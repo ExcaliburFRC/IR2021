@@ -2,6 +2,7 @@ package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import io.excaliburfrc.robot.subsystems.Intake;
@@ -59,16 +60,10 @@ public class RobotContainer {
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
     // DO NOT CREATE MORE JOYSTICKS! or rename them
     new JoystickButton(armJoystick, 4)
-        .whenPressed(
-            () -> {
-              shooter.start(Shooter.ShooterSpeed.HIGH);
-            },
-            shooter)
-        .whenReleased(
-            () -> {
-              shooter.stop();
-            },
-            shooter);
+        .toggleWhenPressed(
+            new StartEndCommand(
+                () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
+
     final JoystickButton in = new JoystickButton(armJoystick, 1);
     final JoystickButton out = new JoystickButton(armJoystick, 2);
 

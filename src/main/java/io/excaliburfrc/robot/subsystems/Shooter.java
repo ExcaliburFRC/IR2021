@@ -3,7 +3,14 @@ package io.excaliburfrc.robot.subsystems;
 import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import io.excaliburfrc.lib.CANEncoderSim;
+import io.excaliburfrc.lib.SimSparkMax;
 import io.excaliburfrc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
@@ -12,15 +19,38 @@ public class Shooter extends SubsystemBase {
   private final CANPIDController controller;
   private ShooterSpeed target = null;
 
+  private CANEncoderSim simEncoder;
+  private FlywheelSim flywheelSim;
+
   public Shooter() {
-    shooterMotor = new CANSparkMax(ShooterConstants.SHOOTER_ID, MotorType.kBrushless);
+    shooterMotor = new SimSparkMax(ShooterConstants.SHOOTER_ID, MotorType.kBrushless);
     shooterMotor.setIdleMode(IdleMode.kCoast);
 
     encoder = shooterMotor.getEncoder();
     encoder.setVelocityConversionFactor(ShooterConstants.GEARING);
 
     controller = shooterMotor.getPIDController();
-    controller.setFeedbackDevice(encoder);
+    controller.setP(ShooterConstants.kP);
+    controller.setI(0);
+    controller.setD(0);
+    controller.setFF(ShooterConstants.kF);
+
+    if (RobotBase.isSimulation()) {
+      simEncoder = new CANEncoderSim(false, ShooterConstants.SHOOTER_ID);
+      flywheelSim =
+          new FlywheelSim(
+              LinearSystemId.identifyVelocitySystem(ShooterConstants.kV, ShooterConstants.kA),
+              DCMotor.getNEO(1),
+              ShooterConstants.GEARING);
+    }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    flywheelSim.setInputVoltage(
+        RobotController.getInputVoltage() * shooterMotor.getAppliedOutput());
+    flywheelSim.update(0.02);
+    simEncoder.setVelocity(flywheelSim.getAngularVelocityRPM());
   }
 
   public void start(ShooterSpeed speed) {
