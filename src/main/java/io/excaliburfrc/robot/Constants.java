@@ -1,5 +1,7 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.wpilibj.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -23,6 +25,9 @@ public final class Constants {
     public static final int LEFT_FOLLOWER_ID = 14;
     public static final int TPS = 2046;
     public static final int TRACK_WIDTH = 60;
+    public static final double WHEEL_RADIUS = Units.inchesToMeters(6);
+    public static final double GEARING = 10.25;
+    public static final double kV_lin = 0.2, kA_lin = 0.3, kV_ang = 0.2, kA_ang = 0.3;
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`

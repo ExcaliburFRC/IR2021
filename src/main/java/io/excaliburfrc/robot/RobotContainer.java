@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.subsystems.*;
-import io.excaliburfrc.robot.subsystems.Intake.Mode;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -62,7 +61,7 @@ public class RobotContainer {
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> intake.activate(Mode.IN), intake)
+        .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
         .whenReleased(() -> intake.stop(), intake);
     new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.raise(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.lower(), intake);
@@ -100,6 +99,6 @@ public class RobotContainer {
 
   private void initSubsystemStates() {
     intake.raise();
-    intake.activate(Mode.OFF);
+    intake.activate(Intake.Mode.OFF);
   }
 }
