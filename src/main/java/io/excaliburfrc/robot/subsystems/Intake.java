@@ -1,25 +1,23 @@
 package io.excaliburfrc.robot.subsystems;
 
 import static io.excaliburfrc.robot.Constants.IntakeConstants.*;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
-  private CANSparkMax intakeMotor;
+  private WPI_VictorSPX intakeMotor;
   private DoubleSolenoid piston;
 
   public Intake() {
-    intakeMotor = new CANSparkMax(INTAKE_MOTOR_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    intakeMotor = new WPI_VictorSPX(2);
     piston = new DoubleSolenoid(FORWARD_CHANNEL, REVERSE_CHANNEL);
   }
 
   public enum Mode {
     IN(0.6),
     OUT(-0.4),
-    OFF(0);
+    OFF(0.0);
 
     Mode(double i) {
       speed = i;
@@ -38,7 +36,7 @@ public class Intake extends SubsystemBase {
 
   public void activate(Mode speed) {
     if (piston.get() == DoubleSolenoid.Value.kReverse) {
-      intakeMotor.set(Mode.OFF.speed);
+      intakeMotor.set(Mode.OFF.speed); //Mode.OFF.speed
     } else {
       intakeMotor.set(speed.speed);
     }
