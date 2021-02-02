@@ -41,4 +41,13 @@ public final class Constants {
     public static final int LOADING_ID = 32;
     public static final int LIMIT = 20;
   }
+
+  public static final class ClimberConstants {
+    public static final int LEADER_ID = 51;
+    public static final int FOLLOWER_ID = 50;
+    public static final int HANGER_REV = 2;
+    public static final int HANGER_FWD = 3;
+    public static final double UP_SPEED = 0.6;
+    public static final double DOWN_SPEED = -0.4;
+  }
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import io.excaliburfrc.robot.subsystems.Climber;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import io.excaliburfrc.robot.subsystems.Intake;
 import io.excaliburfrc.robot.subsystems.Intake.Mode;
@@ -22,6 +23,7 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter();
   public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
+  public final Climber climber = new Climber();
 
   private final Joystick driveJoystick = new Joystick(0);
   private final Joystick armJoystick = new Joystick(1);
@@ -91,6 +93,44 @@ public class RobotContainer {
           transporter.setLoading(Transporter.Mode.OFF);
         },
         transporter);
+
+    new JoystickButton(armJoystick, 6)
+        .whenPressed(
+            () -> {
+              climber.open();
+            },
+            climber);
+
+    new JoystickButton(armJoystick, 7)
+        .whenPressed(
+            () -> {
+              climber.close();
+            },
+            climber);
+
+    new JoystickButton(armJoystick, 8)
+        .whileHeld(
+            () -> {
+              climber.up();
+            },
+            climber)
+        .whenReleased(
+            () -> {
+              climber.stopMotor();
+            },
+            climber);
+
+    new JoystickButton(armJoystick, 9)
+        .whileHeld(
+            () -> {
+              climber.down();
+            },
+            climber)
+        .whenReleased(
+            () -> {
+              climber.stopMotor();
+            },
+            climber);
   }
 
   private void initSubsystemStates() {
