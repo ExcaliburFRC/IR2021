@@ -6,9 +6,10 @@ import com.revrobotics.*
 import edu.wpi.first.hal.SimDouble
 import edu.wpi.first.wpilibj.controller.PIDController
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim
+import edu.wpi.first.wpilibj2.command.RunCommand
 
 internal class CANPIDControllerSim(device: CANSparkMax, private val simDevice: SimDeviceSim) :
-  CANPIDController(device) {
+    CANPIDController(device) {
   init {
     instances += this
   }
@@ -23,8 +24,8 @@ internal class CANPIDControllerSim(device: CANSparkMax, private val simDevice: S
   override fun setReference(value: Double, ctrl: ControlType): CANError {
     ref = value
     refType = simDevice.getDouble(ctrlToKey(ctrl, alt))
-    isRunning = true
     calculate()
+    if (!command.isScheduled) command.schedule()
     return super.setReference(value, ctrl)
   }
 
@@ -72,11 +73,7 @@ internal class CANPIDControllerSim(device: CANSparkMax, private val simDevice: S
 
   companion object {
     private val instances = HashSet<CANPIDControllerSim>()
-    var isRunning: Boolean = false
-//    set(value) {
-//      if(value) CommandScheduler.getInstance().addButton { instances.forEach {it.calculate()} }
-//      field = value
-//    }
+    private val command = RunCommand({ instances.forEach { it.calculate() } })
   }
 }
 
