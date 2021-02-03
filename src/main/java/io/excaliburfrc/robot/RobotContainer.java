@@ -30,6 +30,7 @@ public class RobotContainer {
     initSubsystemStates();
   }
 
+  @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
     // create `JoystickButton`s binding between the buttons and commands.
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
@@ -53,11 +54,9 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(
         new RunCommand(
-            () -> {
-              drivetrain.arcade(
-                  driveJoystick.getRawAxis(forwardDriveAxis),
-                  driveJoystick.getRawAxis(rotateDriveAxis));
-            },
+            () -> drivetrain.arcade(
+                driveJoystick.getRawAxis(forwardDriveAxis),
+                driveJoystick.getRawAxis(rotateDriveAxis)),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)

@@ -23,11 +23,12 @@ public final class Constants {
     public static final int RIGHT_FOLLOWER_ID = 12;
     public static final int LEFT_LEADER_ID = 13;
     public static final int LEFT_FOLLOWER_ID = 14;
-    public static final int TPS = 2046;
-    public static final int TRACK_WIDTH = 60;
+    public static final int CPR = 2046;
+    public static final double TRACK_WIDTH = 0.60;
     public static final double WHEEL_RADIUS = Units.inchesToMeters(6);
     public static final double GEARING = 10.25;
-    public static final double kV_lin = 0.2, kA_lin = 0.3, kV_ang = 0.2, kA_ang = 0.3;
+    public static final double kV_lin = 1.98, kA_lin = 0.2, kV_ang = 1.5, kA_ang = 0.3;
+    public static final double PULSE_TO_METER = (CPR * GEARING) / (WHEEL_RADIUS  * Math.PI);
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`

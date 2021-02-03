@@ -14,8 +14,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
+import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
@@ -24,44 +23,41 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import io.excaliburfrc.lib.CANEncoderSim;
 import io.excaliburfrc.lib.SimSparkMax;
 
 public class Drivetrain extends SubsystemBase {
-  private CANSparkMax rightLeader;
-  private CANSparkMax rightFollower;
-  private CANSparkMax leftLeader;
-  private CANSparkMax leftFollower;
-  private CANEncoder leftEncoder;
-  private CANEncoder rightEncoder;
-  private AHRS gyro;
+  private final CANSparkMax rightLeader, rightFollower;
+  private final CANSparkMax leftLeader, leftFollower;
+  private final CANEncoder leftEncoder;
+  private final CANEncoder rightEncoder;
+  private final AHRS gyro;
 
-  private DifferentialDrive drive;
-  private DifferentialDriveOdometry odometry;
+  private final DifferentialDrive drive;
+  private final DifferentialDriveOdometry odometry;
 
-  private CANEncoderSim simRightEncoder, simLeftEncoder;
   private SimDouble simGyro;
   private DifferentialDrivetrainSim simDrive;
-  private Field2d field;
+  private final Field2d field;
 
   public Drivetrain() {
     rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     leftLeader = new SimSparkMax(LEFT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     leftFollower = new SimSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     rightFollower = new SimSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    leftEncoder = leftLeader.getAlternateEncoder(TPS);
-    rightEncoder = rightLeader.getAlternateEncoder(TPS);
+    leftEncoder = leftLeader.getAlternateEncoder(CPR);
+    leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    rightEncoder = rightLeader.getAlternateEncoder(CPR);
+    rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
     gyro = new AHRS();
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
     drive = new DifferentialDrive(leftLeader, rightLeader);
+    drive.setRightSideInverted(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
     field = new Field2d();
 
     if (RobotBase.isSimulation()) {
-      simLeftEncoder = new CANEncoderSim(true, LEFT_LEADER_ID);
-      simRightEncoder = new CANEncoderSim(true, RIGHT_LEADER_ID);
       simGyro = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
       simDrive =
           new DifferentialDrivetrainSim(
@@ -81,11 +77,10 @@ public class Drivetrain extends SubsystemBase {
 
     simDrive.update(0.02);
 
-    simLeftEncoder.setPosition(simDrive.getLeftPositionMeters());
-    simLeftEncoder.setVelocity(simDrive.getLeftVelocityMetersPerSecond());
-    simRightEncoder.setPosition(simDrive.getRightPositionMeters());
-    simRightEncoder.setVelocity(simDrive.getRightVelocityMetersPerSecond());
+    leftEncoder.setPosition(simDrive.getLeftPositionMeters());
+    rightEncoder.setPosition(simDrive.getRightPositionMeters());
     simGyro.set(simDrive.getHeading().getDegrees());
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
   }
 
   @Override
@@ -114,9 +109,7 @@ public class Drivetrain extends SubsystemBase {
   public Command ramsete(Trajectory path) {
     return new RamseteCommand(
         path,
-        () -> {
-          return odometry.getPoseMeters();
-        },
+        () -> odometry.getPoseMeters(),
         new RamseteController(),
         new DifferentialDriveKinematics(TRACK_WIDTH),
         (left, right) -> {
