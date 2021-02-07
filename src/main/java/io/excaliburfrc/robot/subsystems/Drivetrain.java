@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.simulation.*;
@@ -118,5 +119,15 @@ public class Drivetrain extends SubsystemBase {
           rightLeader.getPIDController().setReference(right, ControlType.kVelocity);
         },
         this);
+  }
+
+  public void resetPose() {
+    gyro.reset();
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+    var pose = new Pose2d(0, 0, gyro.getRotation2d());
+    odometry.resetPosition(pose, gyro.getRotation2d());
+    simDrive.setPose(pose);
+    field.setRobotPose(pose);
   }
 }
