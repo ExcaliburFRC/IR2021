@@ -80,7 +80,8 @@ public class Drivetrain extends SubsystemBase {
     leftEncoder.setPosition(simDrive.getLeftPositionMeters());
     rightEncoder.setPosition(simDrive.getRightPositionMeters());
     simGyro.set(simDrive.getHeading().getDegrees());
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
   }
 
   @Override

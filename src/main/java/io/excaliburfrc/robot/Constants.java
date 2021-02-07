@@ -28,7 +28,7 @@ public final class Constants {
     public static final double WHEEL_RADIUS = Units.inchesToMeters(6);
     public static final double GEARING = 10.25;
     public static final double kV_lin = 1.98, kA_lin = 0.2, kV_ang = 1.5, kA_ang = 0.3;
-    public static final double PULSE_TO_METER = (CPR * GEARING) / (WHEEL_RADIUS  * Math.PI);
+    public static final double PULSE_TO_METER = (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
