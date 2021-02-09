@@ -9,7 +9,6 @@ import io.excaliburfrc.TestUtil;
 import io.excaliburfrc.robot.Constants.IntakeConstants;
 import io.excaliburfrc.robot.subsystems.Intake.Mode;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
 

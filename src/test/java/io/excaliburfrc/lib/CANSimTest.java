@@ -6,11 +6,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
-
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
