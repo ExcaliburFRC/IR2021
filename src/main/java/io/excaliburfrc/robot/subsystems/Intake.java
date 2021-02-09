@@ -6,13 +6,19 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements AutoCloseable {
   private final WPI_VictorSPX intakeMotor;
   private final DoubleSolenoid piston;
 
   public Intake() {
     intakeMotor = new WPI_VictorSPX(INTAKE_MOTOR_ID);
     piston = new DoubleSolenoid(FORWARD_CHANNEL, REVERSE_CHANNEL);
+  }
+
+  @Override
+  public void close() throws Exception {
+    intakeMotor.DestroyObject();
+    piston.close();
   }
 
   public enum Mode {
@@ -50,4 +56,6 @@ public class Intake extends SubsystemBase {
   public void stop() {
     intakeMotor.set(Mode.OFF.speed);
   }
+
+
 }

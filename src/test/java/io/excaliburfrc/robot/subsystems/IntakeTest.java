@@ -3,24 +3,23 @@ package io.excaliburfrc.robot.subsystems;
 import static io.excaliburfrc.TestUtil.DELTA;
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.*;
 import edu.wpi.first.wpilibj.simulation.*;
 import io.excaliburfrc.TestUtil;
 import io.excaliburfrc.robot.Constants.IntakeConstants;
 import io.excaliburfrc.robot.subsystems.Intake.Mode;
 import java.util.Arrays;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
 
 class IntakeTest {
-  static Intake intake;
-  static SimDouble simAppliedOutput;
-  static PCMSim simPcm;
+  Intake intake;
+  SimDouble simAppliedOutput;
+  PCMSim simPcm;
 
-  @BeforeAll
-  static void setup() {
+  @BeforeEach
+  void setup() {
     assert HAL.initialize(500, 0);
     intake = new Intake();
     simAppliedOutput =
@@ -29,6 +28,12 @@ class IntakeTest {
     simPcm = new PCMSim();
     DriverStationSim.setEnabled(true);
     HAL.simPeriodicBefore();
+  }
+
+  @AfterEach
+  void close() throws Exception {
+    intake.close();
+    SimDeviceSim.resetData();
   }
 
   @Test
