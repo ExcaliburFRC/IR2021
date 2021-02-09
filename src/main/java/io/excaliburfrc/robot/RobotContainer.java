@@ -4,12 +4,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import io.excaliburfrc.robot.subsystems.Climber;
-import io.excaliburfrc.robot.subsystems.Drivetrain;
-import io.excaliburfrc.robot.subsystems.Intake;
+import io.excaliburfrc.robot.subsystems.*;
 import io.excaliburfrc.robot.subsystems.Intake.Mode;
-import io.excaliburfrc.robot.subsystems.Shooter;
-import io.excaliburfrc.robot.subsystems.Transporter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,101 +32,70 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    new JoystickButton(armJoystick, 3)
-        .whenPressed(
-            () -> {
-              intake.activate(Intake.Mode.IN);
-            },
-            intake)
-        .whenReleased(
-            () -> {
-              intake.stop();
-            },
-            intake);
+    // create `JoystickButton`s binding between the buttons and commands.
+    // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
+    // DO NOT CREATE MORE JOYSTICKS! or rename them
 
-    new JoystickButton(armJoystick, 4).whenActive(() -> intake.raise(), intake);
-    new JoystickButton(armJoystick, 5).whenPressed(() -> intake.lower(), intake);
+    // driverJoystick
+    final int forwardDriveAxis = 1;
+    final int rotateDriveAxis = 2;
+
+    // armJoystick
+    final int shootButton = 1;
+    final int inButton = 2;
+    final int ejectButton = 3;
+    final int openIntakeButton = 4;
+    final int closeIntakeButton = 5;
+    final int startShootButton = 6;
+    final int climberOpenButton = 7;
+    final int climberCloseButton = 8;
+    final int climberUpButton = 9;
+    final int climberDownButton = 10;
 
     drivetrain.setDefaultCommand(
         new RunCommand(
             () -> {
-              drivetrain.arcade(driveJoystick.getRawAxis(1), driveJoystick.getRawAxis(2));
+              drivetrain.arcade(
+                  driveJoystick.getRawAxis(forwardDriveAxis),
+                  driveJoystick.getRawAxis(rotateDriveAxis));
             },
             drivetrain));
 
-    // create `JoystickButton`s binding between the buttons and commands.
-    // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
-    // DO NOT CREATE MORE JOYSTICKS! or rename them
-    new JoystickButton(armJoystick, 4)
+    new JoystickButton(armJoystick, inButton)
+        .whenPressed(() -> intake.activate(Mode.IN), intake)
+        .whenReleased(() -> intake.stop(), intake);
+    new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.raise(), intake);
+    new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.lower(), intake);
+
+    new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
             new StartEndCommand(
                 () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
 
-    final JoystickButton in = new JoystickButton(armJoystick, 1);
-    final JoystickButton out = new JoystickButton(armJoystick, 2);
+    new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
+    new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
 
-    in.whenPressed(
-        () -> {
-          transporter.setFlicker(Transporter.Mode.IN);
-          transporter.setLoading(Transporter.Mode.IN);
-        },
-        transporter);
-    in.whenReleased(
-        () -> {
-          transporter.setFlicker(Transporter.Mode.OFF);
-          transporter.setLoading(Transporter.Mode.OFF);
-        },
-        transporter);
-    out.whenPressed(
-        () -> {
-          transporter.setFlicker(Transporter.Mode.OUT);
-          transporter.setLoading(Transporter.Mode.OUT);
-        },
-        transporter);
-    out.whenReleased(
-        () -> {
-          transporter.setFlicker(Transporter.Mode.OFF);
-          transporter.setLoading(Transporter.Mode.OFF);
-        },
-        transporter);
+    new JoystickButton(armJoystick, climberUpButton)
+        .whileHeld(() -> climber.up(), climber)
+        .whenReleased(() -> climber.stopMotor(), climber);
 
-    new JoystickButton(armJoystick, 6)
-        .whenPressed(
-            () -> {
-              climber.open();
-            },
-            climber);
+    new JoystickButton(armJoystick, climberDownButton)
+        .whileHeld(() -> climber.down(), climber)
+        .whenReleased(() -> climber.stopMotor(), climber);
 
-    new JoystickButton(armJoystick, 7)
-        .whenPressed(
-            () -> {
-              climber.close();
-            },
-            climber);
+    // TODO: merge with intake
+    new JoystickButton(armJoystick, inButton)
+        .whenPressed(() -> transporter.activate(Transporter.Mode.IN), transporter)
+        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
 
-    new JoystickButton(armJoystick, 8)
-        .whileHeld(
-            () -> {
-              climber.up();
-            },
-            climber)
-        .whenReleased(
-            () -> {
-              climber.stopMotor();
-            },
-            climber);
+    new JoystickButton(armJoystick, ejectButton)
+        .whenPressed(() -> transporter.activate(Transporter.Mode.OUT), transporter)
+        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
 
-    new JoystickButton(armJoystick, 9)
-        .whileHeld(
-            () -> {
-              climber.down();
-            },
-            climber)
-        .whenReleased(
-            () -> {
-              climber.stopMotor();
-            },
-            climber);
+    // TODO: merge with shooter
+    new JoystickButton(armJoystick, shootButton)
+        .whenPressed(() -> transporter.activate(Transporter.Mode.SHOOT), transporter)
+        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
   }
 
   private void initSubsystemStates() {

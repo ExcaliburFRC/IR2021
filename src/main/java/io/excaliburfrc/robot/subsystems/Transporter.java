@@ -5,12 +5,14 @@ import static io.excaliburfrc.robot.Constants.TransporterConstants.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Transporter extends SubsystemBase {
   private final WPI_VictorSPX flicker, loading;
-  private ColorSensorV3 ballDetector;
+  private final ColorSensorV3 ballDetector;
 
   public Transporter() {
     flicker = new WPI_VictorSPX(FLICKER_ID);
@@ -18,24 +20,33 @@ public class Transporter extends SubsystemBase {
     ballDetector = new ColorSensorV3(I2C.Port.kOnboard);
   }
 
-  public enum Mode {
-    IN(0.6),
-    OUT(-0.4),
-    OFF(0);
+  public void close() {
+    flicker.DestroyObject();
+    loading.DestroyObject();
+    I2CJNI.i2CClose(Port.kOnboard.value);
+  }
 
-    Mode(double i) {
-      speed = i;
+  public enum Mode {
+    SHOOT(0.6, 0.5),
+    IN(0.6, 0.5),
+    OUT(-0.4, -0.3),
+    OFF(0, 0);
+
+    Mode(double fl, double ld) {
+      flicker = fl;
+      loading = ld;
     }
 
-    public final double speed;
+    public final double flicker, loading;
   }
 
-  public void setFlicker(Mode speed) {
-    flicker.set(ControlMode.PercentOutput, speed.speed);
-  }
-
-  public void setLoading(Mode speed) {
-    loading.set(ControlMode.PercentOutput, speed.speed);
+  public void activate(Mode mode) {
+    // if intaking, don't let the ball pass the sensor
+    if (mode == Mode.IN && isBallReady()) {
+      mode = Mode.OFF;
+    }
+    flicker.set(ControlMode.PercentOutput, mode.flicker);
+    loading.set(ControlMode.PercentOutput, mode.loading);
   }
 
   public boolean isBallReady() {
