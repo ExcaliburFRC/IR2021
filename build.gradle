@@ -1,6 +1,5 @@
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "1.4.21"
     id "edu.wpi.first.GradleRIO" version "2021.2.1"
     id "com.diffplug.spotless" version "5.9.0"
 }
@@ -83,6 +82,7 @@ jar {
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
 
+
 spotless {
     java {
         trimTrailingWhitespace()
@@ -90,19 +90,4 @@ spotless {
         indentWithSpaces(2)
         googleJavaFormat()
     }
-    kotlin {
-        trimTrailingWhitespace()
-        endWithNewline()
-        indentWithSpaces(2)
-        ktfmt()
-    }
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "11"
-}
-
-sourceSets {
-    main.kotlin.srcDirs = ['src/main/java']
-    main.java.srcDirs = ['src/main/java']
 }
