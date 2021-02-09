@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import io.excaliburfrc.robot.subsystems.Intake;
+import io.excaliburfrc.robot.subsystems.Intake.Mode;
 import io.excaliburfrc.robot.subsystems.Transporter;
 
 /**
@@ -26,6 +27,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    initSubsystemStates();
   }
 
   private void configureButtonBindings() {
@@ -41,18 +43,8 @@ public class RobotContainer {
             },
             intake);
 
-    new JoystickButton(armJoystick, 4)
-        .whenPressed(
-            () -> {
-              intake.raise();
-            },
-            intake);
-    new JoystickButton(armJoystick, 5)
-        .whenPressed(
-            () -> {
-              intake.lower();
-            },
-            intake);
+    new JoystickButton(armJoystick, 4).whenActive(() -> intake.raise(), intake);
+    new JoystickButton(armJoystick, 5).whenPressed(() -> intake.lower(), intake);
 
     drivetrain.setDefaultCommand(
         new RunCommand(
@@ -91,5 +83,10 @@ public class RobotContainer {
           transporter.setLoading(Transporter.Mode.OFF);
         },
         transporter);
+  }
+
+  private void initSubsystemStates() {
+    intake.raise();
+    intake.activate(Mode.OFF);
   }
 }

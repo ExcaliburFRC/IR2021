@@ -6,6 +6,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
@@ -16,16 +17,16 @@ import org.junit.jupiter.params.provider.*;
 class CANSimTest {
   static final double DELTA = 1e-6;
 
-  static CANEncoder encoder;
-  static CANEncoderSim simEncoder;
-  static CANEncoder altEncoder;
-  static CANEncoderSim simAltEncoder;
+  CANEncoder encoder;
+  CANEncoderSim simEncoder;
+  CANEncoder altEncoder;
+  CANEncoderSim simAltEncoder;
 
   //  CANSparkMax motor;
-  static SimSparkMax simMotor;
+  SimSparkMax simMotor;
 
-  @BeforeAll
-  static void setup() {
+  @BeforeEach
+  void setup() {
     assert HAL.initialize(500, 0);
 
     int id = new Random().nextInt(60);
@@ -37,6 +38,12 @@ class CANSimTest {
 
     altEncoder = simMotor.getAlternateEncoder(2046);
     simAltEncoder = new CANEncoderSim(true, id);
+  }
+
+  @AfterEach
+  void close() {
+    simMotor.close();
+    SimDeviceSim.resetData();
   }
 
   @ParameterizedTest
