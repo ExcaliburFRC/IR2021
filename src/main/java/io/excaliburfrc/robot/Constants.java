@@ -36,10 +36,10 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int SHOOTER_ID = 41;
     public static final double TOLERANCE = 100; // TODO: tune
-    public static final double GEARING = 3; // TODO: tune
-    public static final double kV = 1.2, kA = 0.3; // TODO: tune
-    public static final double kP = 0.002, kF = 0.11;
-    //    1.98, 0.2, 1.5, 0.3
+    public static final double GEARING = 3;
+    public static final double kV = 0.388, kA = 0.167; // from frc-char
+    public static final double kP = 0.00336; // from frc-char
+    public static final double kF = 0.388;
   }
 
   public static final class TransporterConstants {
