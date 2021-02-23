@@ -52,13 +52,13 @@ public class RobotContainer {
     final int climberUpButton = 9;
     final int climberDownButton = 10;
 
-    drivetrain.setDefaultCommand(
-        new RunCommand(
-            () ->
-                drivetrain.arcade(
-                    driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis)),
-            drivetrain));
+//    drivetrain.setDefaultCommand(
+//        new RunCommand(
+//            () ->
+//                drivetrain.arcade(
+//                    driveJoystick.getRawAxis(forwardDriveAxis),
+//                    driveJoystick.getRawAxis(rotateDriveAxis)),
+//            drivetrain));
 
     new JoystickButton(armJoystick, inButton)
         .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
@@ -69,7 +69,7 @@ public class RobotContainer {
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
             new StartEndCommand(
-                () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
+                () -> shooter.start(Shooter.ShooterSpeed.LOW), () -> shooter.stop(), shooter));
 
     new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
     new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
