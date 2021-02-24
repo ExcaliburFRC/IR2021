@@ -27,7 +27,7 @@ public class CANPIDControllerSim extends CANPIDController implements Runnable {
 
   @Override
   public CANError setReference(double value, ControlType ctrl) {
-    if(ctrl == ControlType.kDutyCycle)       DriverStation.reportError("Caller:", true);
+    if (ctrl == ControlType.kDutyCycle) DriverStation.reportError("Caller:", true);
 
     this.refType = ctrl;
     this.ref = value;
@@ -39,7 +39,7 @@ public class CANPIDControllerSim extends CANPIDController implements Runnable {
   public void run() {
     if (refType == ControlType.kDutyCycle) {
       appliedOutput.set(ref);
-//      System.out.println("appliedOutput.get() = " + appliedOutput.get());
+      //      System.out.println("appliedOutput.get() = " + appliedOutput.get());
       return;
     }
     System.out.println("refType = " + refType);

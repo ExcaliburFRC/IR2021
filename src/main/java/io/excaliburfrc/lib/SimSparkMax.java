@@ -1,6 +1,8 @@
 package io.excaliburfrc.lib;
 
 import com.revrobotics.*;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.jni.CANSparkMaxJNI;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimulatorJNI;
 import edu.wpi.first.hal.simulation.SimulatorJNI.SimPeriodicBeforeCallback;
@@ -37,20 +39,7 @@ public class SimSparkMax extends CANSparkMax {
     if (RobotBase.isSimulation()) {
       getPIDController().setReference(speed, ControlType.kDutyCycle);
     }
-//    super.set(speed);
-  }
-
-  @Override
-  public CANPIDController getPIDController() {
-    if (controller == null) {
-      if (RobotBase.isSimulation()) {
-        controller = new CANPIDControllerSim(this, simDevice);
-        callback = SimulatorJNI.registerSimPeriodicBeforeCallback((Runnable) controller);
-      } else {
-        controller = super.getPIDController();
-      }
-    }
-    return controller;
+    //    super.set(speed);
   }
 
   @Override
@@ -59,5 +48,15 @@ public class SimSparkMax extends CANSparkMax {
       callback.close();
     }
     super.close();
+    CANSparkMaxJNI.c_SparkMax_Destroy(m_sparkMax);
+  }
+
+  @Override
+  public CANPIDController getPIDController() {
+    if (RobotBase.isSimulation()) {
+      var controller = new CANPIDControllerSim(this, simDevice);
+      callback = SimulatorJNI.registerSimPeriodicBeforeCallback(controller);
+      return controller;
+    } else return super.getPIDController();
   }
 }

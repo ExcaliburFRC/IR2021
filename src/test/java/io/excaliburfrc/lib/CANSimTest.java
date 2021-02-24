@@ -80,6 +80,7 @@ class CANSimTest {
   @MethodSource("provide1RandomData")
   void checkMotorSim(double data) {
     simMotor.set(data);
+    HAL.simPeriodicBefore();
     assertEquals(data, simMotor.get(), DELTA);
   }
 

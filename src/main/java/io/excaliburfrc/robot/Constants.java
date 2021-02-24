@@ -29,6 +29,7 @@ public final class Constants {
     public static final double GEARING = 10.25;
     public static final double kV_lin = 1.98, kA_lin = 0.2, kV_ang = 1.5, kA_ang = 0.3;
     public static final double PULSE_TO_METER = (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
+    public static final double kP = 0.85, kI = 0, kD = 0, kF = 0.1;
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
@@ -36,10 +37,10 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int SHOOTER_ID = 41;
     public static final double TOLERANCE = 100; // TODO: tune
-    public static final double GEARING = 1;
-    public static final double kV = 0.388, kA = 0.167; // from frc-char
-    public static final double kP = 0.00336 / 3; // from frc-char
-    public static final double kF = 0.0033333333333333335;
+    public static final double GEARING = 3; // TODO: tune
+    public static final double kV = 1.2, kA = 0.3; // TODO: tune
+    public static final double kP = 0.002, kF = 0.11;
+    //    1.98, 0.2, 1.5, 0.3
   }
 
   public static final class TransporterConstants {

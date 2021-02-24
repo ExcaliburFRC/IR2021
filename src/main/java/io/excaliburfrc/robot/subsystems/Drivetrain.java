@@ -3,16 +3,14 @@ package io.excaliburfrc.robot.subsystems;
 import static io.excaliburfrc.robot.Constants.DriveConstants.*;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.ControlType;
+import com.revrobotics.*;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.simulation.*;
@@ -21,9 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
+import io.excaliburfrc.lib.CANEncoderSim;
 import io.excaliburfrc.lib.SimSparkMax;
 
 public class Drivetrain extends SubsystemBase {
@@ -35,8 +32,12 @@ public class Drivetrain extends SubsystemBase {
 
   private final DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
+  private final CANPIDController leftController;
+  private final CANPIDController rightController;
 
   private SimDouble simGyro;
+  private CANEncoderSim simLeftEncoder;
+  private CANEncoderSim simRightEncoder;
   private DifferentialDrivetrainSim simDrive;
   private final Field2d field;
 
@@ -49,6 +50,15 @@ public class Drivetrain extends SubsystemBase {
     leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
     rightEncoder = rightLeader.getAlternateEncoder(CPR);
     rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    leftController = leftLeader.getPIDController();
+    leftController.setFeedbackDevice(leftEncoder);
+    leftController.setP(kP);
+    leftController.setFF(kF);
+    leftController.setI(kI);
+    leftController.setD(kD);
+    rightController = rightLeader.getPIDController();
+    rightController.setFeedbackDevice(rightEncoder);
+
     gyro = new AHRS();
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
@@ -59,6 +69,8 @@ public class Drivetrain extends SubsystemBase {
     field = new Field2d();
 
     if (RobotBase.isSimulation()) {
+      simLeftEncoder = new CANEncoderSim(true, LEFT_LEADER_ID);
+      simRightEncoder = new CANEncoderSim(true, RIGHT_LEADER_ID);
       simGyro = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
       simDrive =
           new DifferentialDrivetrainSim(
@@ -80,7 +92,9 @@ public class Drivetrain extends SubsystemBase {
 
     leftEncoder.setPosition(simDrive.getLeftPositionMeters());
     rightEncoder.setPosition(simDrive.getRightPositionMeters());
-    simGyro.set(simDrive.getHeading().getDegrees());
+    simLeftEncoder.setVelocity(simDrive.getLeftVelocityMetersPerSecond());
+    simRightEncoder.setVelocity(simDrive.getRightVelocityMetersPerSecond());
+    simGyro.set(-simDrive.getHeading().getDegrees());
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
   }
@@ -110,24 +124,39 @@ public class Drivetrain extends SubsystemBase {
 
   public Command ramsete(Trajectory path) {
     return new RamseteCommand(
-        path,
-        () -> odometry.getPoseMeters(),
-        new RamseteController(),
-        new DifferentialDriveKinematics(TRACK_WIDTH),
-        (left, right) -> {
-          leftLeader.getPIDController().setReference(left, ControlType.kVelocity);
-          rightLeader.getPIDController().setReference(right, ControlType.kVelocity);
-        },
-        this);
+            path,
+            () -> odometry.getPoseMeters(),
+            new RamseteController(),
+            //            new SimpleMotorFeedforward(0.22, 1.98), // remove
+            new DifferentialDriveKinematics(TRACK_WIDTH),
+            //            () -> // remove
+            //            new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(),
+            // rightEncoder.getVelocity()),
+            //            new PIDController(kP, kI, kD), // remove
+            //            new PIDController(kP, kI, kD), // remove
+            (left, right) -> {
+              //              tankDrive(
+              //                  left / RobotController.getInputVoltage(),
+              //                  right / RobotController.getInputVoltage()); // remove
+              System.out.println("left = " + left);
+              System.out.println("right = " + right);
+              leftController.setReference(left, ControlType.kVelocity);
+              rightController.setReference(right, ControlType.kVelocity);
+            },
+            this)
+        .andThen(() -> this.arcade(0, 0), this);
+  }
+
+  public void resetPose(Pose2d pose) {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+    odometry.resetPosition(pose, gyro.getRotation2d());
+    simDrive.setPose(pose);
+    field.setRobotPose(pose);
   }
 
   public void resetPose() {
     gyro.reset();
-    leftEncoder.setPosition(0);
-    rightEncoder.setPosition(0);
-    var pose = new Pose2d(0, 0, gyro.getRotation2d());
-    odometry.resetPosition(pose, gyro.getRotation2d());
-    simDrive.setPose(pose);
-    field.setRobotPose(pose);
+    resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
   }
 }

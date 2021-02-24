@@ -84,6 +84,7 @@ jar {
 
 
 spotless {
+    lineEndings 'UNIX'
     java {
         trimTrailingWhitespace()
         endWithNewline()

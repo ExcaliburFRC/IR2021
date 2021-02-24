@@ -2,6 +2,7 @@ package io.excaliburfrc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import io.excaliburfrc.robot.RobotContainer.AutoPath;
 
 /**
  * This is a sample program to demonstrate the use of state-space classes in robot simulation. This
@@ -34,7 +35,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // init auto
-    m_robotContainer.drivetrain.resetPose();
+    var auto = AutoPath.Slalum;
+    m_robotContainer.drivetrain.resetPose(auto.getStartingPose());
+    m_robotContainer.getAuto(auto).schedule();
   }
 
   @Override
