@@ -1,11 +1,20 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import io.excaliburfrc.robot.commands.auto.SlalumAuto;
 import io.excaliburfrc.robot.subsystems.*;
-import io.excaliburfrc.robot.subsystems.Intake.Mode;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,16 +30,22 @@ public class RobotContainer {
   public final Drivetrain drivetrain = new Drivetrain();
   public final Climber climber = new Climber();
 
+  private final SendableChooser<Command> chooser = new SendableChooser<>();
+
   private final Joystick driveJoystick = new Joystick(0);
   private final Joystick armJoystick = new Joystick(1);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    chooser.setDefaultOption("Nothing", new InstantCommand());
+    chooser.addOption("Slalum", new SlalumAuto(drivetrain).getCommand());
+    SmartDashboard.putData("Auto", chooser);
     // Configure the button bindings
     configureButtonBindings();
     initSubsystemStates();
   }
 
+  @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
     // create `JoystickButton`s binding between the buttons and commands.
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
@@ -54,15 +69,14 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(
         new RunCommand(
-            () -> {
-              drivetrain.arcade(
-                  driveJoystick.getRawAxis(forwardDriveAxis),
-                  driveJoystick.getRawAxis(rotateDriveAxis));
-            },
+            () ->
+                drivetrain.arcade(
+                    driveJoystick.getRawAxis(forwardDriveAxis),
+                    driveJoystick.getRawAxis(rotateDriveAxis)),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> intake.activate(Mode.IN), intake)
+        .whileHeld(() -> intake.activate(Intake.Mode.IN), intake)
         .whenReleased(() -> intake.stop(), intake);
     new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.raise(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.lower(), intake);
@@ -100,6 +114,56 @@ public class RobotContainer {
 
   private void initSubsystemStates() {
     intake.raise();
-    intake.activate(Mode.OFF);
+    intake.activate(Intake.Mode.OFF);
+  }
+
+  public Command getAuto() {
+    return chooser.getSelected();
+  }
+
+  /** @deprecated - move to separate classes */
+  @Deprecated
+  public enum AutoPath {
+    Slalum("slalum"),
+    Barrel("barrel"),
+    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
+
+    private static final Path outputDir =
+        Filesystem.getDeployDirectory().toPath().resolve("output");
+
+    private final List<String> files;
+    private Optional<Trajectory> trajectory = Optional.empty();
+
+    AutoPath(String... files) {
+      this.files = Arrays.asList(files);
+    }
+
+    public Pose2d getStartingPose() {
+      return getTrajectory().getInitialPose();
+    }
+
+    public Trajectory getTrajectory() {
+      if (trajectory.isPresent()) return trajectory.get();
+      if (files.size() == 1) {
+        var res = getTrajectoryFile(files.get(0));
+        trajectory = Optional.of(res);
+        return res;
+      }
+      var res =
+          new Trajectory(
+              files.stream()
+                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
+                  .collect(Collectors.toList()));
+      trajectory = Optional.of(res);
+      return res;
+    }
+
+    private static Trajectory getTrajectoryFile(String filename) {
+      try {
+        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
+      } catch (IOException iox) {
+        throw new RuntimeException(iox);
+      }
+    }
   }
 }
