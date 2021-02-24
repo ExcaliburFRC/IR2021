@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2021.2.1"
+    id "edu.wpi.first.GradleRIO" version "2021.2.2"
     id "com.diffplug.spotless" version "5.9.0"
 }
 
@@ -18,7 +18,7 @@ deploy {
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
             // want to store a team number in this file.
-            team = frc.getTeamNumber()
+            team = 6738
         }
     }
     artifacts {
@@ -84,6 +84,7 @@ jar {
 
 
 spotless {
+    lineEndings 'UNIX'
     java {
         trimTrailingWhitespace()
         endWithNewline()
