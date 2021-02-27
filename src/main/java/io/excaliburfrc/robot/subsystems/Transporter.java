@@ -17,6 +17,7 @@ public class Transporter extends SubsystemBase {
   public Transporter() {
     flicker = new WPI_VictorSPX(FLICKER_ID);
     loading = new WPI_VictorSPX(LOADING_ID);
+    loading.setInverted(true);
     ballDetector = new ColorSensorV3(I2C.Port.kOnboard);
   }
 

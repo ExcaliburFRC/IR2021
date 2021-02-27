@@ -3,12 +3,12 @@ package io.excaliburfrc.robot.subsystems;
 import static io.excaliburfrc.robot.Constants.DriveConstants.*;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
+import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -22,38 +22,60 @@ import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.*;
-import io.excaliburfrc.lib.SimSparkMax;
+import io.excaliburfrc.lib.*;
 
 public class Drivetrain extends SubsystemBase {
   private final CANSparkMax rightLeader;
   private final CANSparkMax rightFollower;
   private final CANSparkMax leftLeader;
   private final CANSparkMax leftFollower;
-  private final Encoder leftEncoder;
-  private final Encoder rightEncoder;
+  private final CANEncoder leftEncoder;
+  private final CANEncoder rightEncoder;
   private final AHRS gyro;
 
   private final DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
+  private final CANPIDController leftController;
+  private final CANPIDController rightController;
 
   private SimDouble simGyro;
-  private EncoderSim simLeftEncoder;
-  private EncoderSim simRightEncoder;
+  private CANEncoderSim simLeftEncoder;
+  private CANEncoderSim simRightEncoder;
   private DifferentialDrivetrainSim simDrive;
   private final Field2d field;
+  private final SimpleMotorFeedforward velFF = new SimpleMotorFeedforward(kS, kV_lin, kA_lin);
 
   public Drivetrain() {
     rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     leftLeader = new SimSparkMax(LEFT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     leftFollower = new SimSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
     rightFollower = new SimSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+
+    leftLeader.restoreFactoryDefaults();
+    rightLeader.restoreFactoryDefaults();
+    leftFollower.restoreFactoryDefaults();
+    rightFollower.restoreFactoryDefaults();
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
 
-    leftEncoder = new Encoder(LEFT_ENC_A, LEFT_ENC_B);
-    leftEncoder.setDistancePerPulse(PULSE_TO_METER);
-    rightEncoder = new Encoder(RIGHT_ENC_A, RIGHT_ENC_B);
-    rightEncoder.setDistancePerPulse(PULSE_TO_METER);
+    leftEncoder = leftLeader.getEncoder();
+    rightEncoder = rightLeader.getEncoder();
+
+    leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    leftEncoder.setVelocityConversionFactor(PULSE_TO_METER / 42.0);
+    rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    rightEncoder.setVelocityConversionFactor(PULSE_TO_METER / 42.0);
+
+    leftController = leftLeader.getPIDController();
+    rightController = rightLeader.getPIDController();
+    leftController.setP(kP);
+    leftController.setI(0);
+    leftController.setD(0);
+    leftController.setFF(0);
+    rightController.setP(kP);
+    rightController.setI(0);
+    rightController.setD(0);
+    rightController.setFF(0);
 
     gyro = new AHRS();
 
@@ -63,8 +85,8 @@ public class Drivetrain extends SubsystemBase {
     field = new Field2d();
 
     if (RobotBase.isSimulation()) {
-      simLeftEncoder = new EncoderSim(leftEncoder);
-      simRightEncoder = new EncoderSim(rightEncoder);
+      simLeftEncoder = new CANEncoderSim(false, LEFT_LEADER_ID);
+      // simRightEncoder = new EncoderSim(rightEncoder);
       simGyro =
           new SimDouble(
               SimDeviceDataJNI.getSimValueHandle(
@@ -88,13 +110,13 @@ public class Drivetrain extends SubsystemBase {
     simDrive.update(0.02);
 
     var leftPositionMeters = simDrive.getLeftPositionMeters();
-    simLeftEncoder.setDistance(leftPositionMeters);
-    System.out.println(leftEncoder.getDistance() == leftPositionMeters);
-    var rightPositionMeters = simDrive.getRightPositionMeters();
-    simRightEncoder.setDistance(rightPositionMeters);
-    System.out.println(rightEncoder.getDistance() == rightPositionMeters);
-    simLeftEncoder.setRate(simDrive.getLeftVelocityMetersPerSecond());
-    simRightEncoder.setRate(simDrive.getRightVelocityMetersPerSecond());
+    // simLeftEncoder.setDistance(leftPositionMeters);
+    // System.out.println(leftEncoder.getDistance() == leftPositionMeters);
+    // var rightPositionMeters = simDrive.getRightPositionMeters();
+    // simRightEncoder.setDistance(rightPositionMeters);
+    // System.out.println(rightEncoder.getDistance() == rightPositionMeters);
+    // simLeftEncoder.setRate(simDrive.getLeftVelocityMetersPerSecond());
+    // simRightEncoder.setRate(simDrive.getRightVelocityMetersPerSecond());
     simGyro.set(-simDrive.getHeading().getDegrees());
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
@@ -102,10 +124,12 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    odometry.update(gyro.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
+    odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
     System.out.println("odometry.getPoseMeters() = " + odometry.getPoseMeters());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
+    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
+    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
   }
 
   public void tankDrive(double left, double right) {
@@ -135,28 +159,32 @@ public class Drivetrain extends SubsystemBase {
         path,
         () -> odometry.getPoseMeters(),
         new RamseteController(),
-        new SimpleMotorFeedforward(kS, kV_lin),
+        // new SimpleMotorFeedforward(kS, kV_lin),
         new DifferentialDriveKinematics(TRACK_WIDTH),
-        () -> new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate()),
-        new PIDController(kP, kI, kD),
-        new PIDController(kP, kI, kD),
-        (left, right) -> {
-          leftLeader.setVoltage(left);
-          rightLeader.setVoltage(right);
-        },
+        // () -> new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate()),
+        // new PIDController(kP, kI, kD),
+        // new PIDController(kP, kI, kD),
+        (left, right) -> setVelocityRefs(left, right),
         this);
   }
 
   public void resetPose(Pose2d pose) {
-    leftEncoder.reset();
-    rightEncoder.reset();
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
     odometry.resetPosition(pose, gyro.getRotation2d());
-    simDrive.setPose(pose);
+    // simDrive.setPose(pose);
     field.setRobotPose(pose);
   }
 
   public void resetPose() {
     gyro.reset();
     resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  }
+
+  public void setVelocityRefs(double left, double right) {
+    leftController.setReference(
+        left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
+    rightController.setReference(
+        right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
   }
 }

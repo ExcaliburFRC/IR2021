@@ -14,8 +14,8 @@ public final class Constants {
   // add a inner class `public static final class` for each subsystem.
   public static final class IntakeConstants {
     public static final int INTAKE_MOTOR_ID = 60;
-    public static final int FORWARD_CHANNEL = 3;
-    public static final int REVERSE_CHANNEL = 2;
+    public static final int FORWARD_CHANNEL = 1;
+    public static final int REVERSE_CHANNEL = 0;
   }
 
   public static final class DriveConstants {
@@ -27,16 +27,11 @@ public final class Constants {
     public static final double TRACK_WIDTH = 0.60; // TODO: tune
     public static final double WHEEL_RADIUS = Units.inchesToMeters(6);
     public static final double GEARING = 10.25;
-    public static final double kV_lin = 1.98, kA_lin = 0.2, kV_ang = 1.5, kA_ang = 0.3;
-    public static final double PULSE_TO_METER = (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
-    public static final double kP = 0.85;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final double kS = 0.85; // TODO: tune
-    public static final int LEFT_ENC_A = 4;
-    public static final int LEFT_ENC_B = 5;
-    public static final int RIGHT_ENC_A = 2;
-    public static final int RIGHT_ENC_B = 3;
+    public static final double kV_lin = 1.27, kA_lin = 0.197, kV_ang = 1.5, kA_ang = 0.3;
+    public static final double PULSE_TO_METER =
+        1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
+    public static final double kP = 0.00385;
+    public static final double kS = 0.125; // TODO: tune
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
@@ -45,9 +40,8 @@ public final class Constants {
     public static final int SHOOTER_ID = 41;
     public static final double TOLERANCE = 100; // TODO: tune
     public static final double GEARING = 3; // TODO: tune
-    public static final double kV = 1.2, kA = 0.3; // TODO: tune
+    public static final double kS = 0.0, kV = 1.2, kA = 0.3; // TODO: tune
     public static final double kP = 0.002, kF = 0.11;
-    //    1.98, 0.2, 1.5, 0.3
   }
 
   public static final class TransporterConstants {
@@ -59,8 +53,8 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final int LEADER_ID = 51;
     public static final int FOLLOWER_ID = 50;
-    public static final int HANGER_REV = 0;
-    public static final int HANGER_FWD = 1;
+    public static final int HANGER_REV = 2;
+    public static final int HANGER_FWD = 3;
     public static final double UP_SPEED = 0.6;
     public static final double DOWN_SPEED = -0.4;
   }

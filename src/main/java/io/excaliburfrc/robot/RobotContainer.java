@@ -52,16 +52,16 @@ public class RobotContainer {
     // DO NOT CREATE MORE JOYSTICKS! or rename them
 
     // driverJoystick
-    final int forwardDriveAxis = 1;
-    final int rotateDriveAxis = 2;
+    final int forwardDriveAxis = 2;
+    final int rotateDriveAxis = 1;
 
     // armJoystick
     final int shootButton = 1;
     final int inButton = 2;
-    final int ejectButton = 3;
-    final int openIntakeButton = 4;
+    final int ejectButton = 4;
+    final int openIntakeButton = 3;
     final int closeIntakeButton = 5;
-    final int startShootButton = 6;
+    final int startShootButton = 12;
     final int climberOpenButton = 7;
     final int climberCloseButton = 8;
     final int climberUpButton = 9;
@@ -72,14 +72,14 @@ public class RobotContainer {
             () ->
                 drivetrain.arcade(
                     driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis)),
+                    driveJoystick.getRawAxis(rotateDriveAxis) * -1),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
-        .whileHeld(() -> intake.activate(Intake.Mode.IN), intake)
+        .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
         .whenReleased(() -> intake.stop(), intake);
-    new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.raise(), intake);
-    new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.lower(), intake);
+    new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.lower(), intake);
+    new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
 
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
@@ -112,9 +112,10 @@ public class RobotContainer {
         .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
   }
 
-  private void initSubsystemStates() {
+  public void initSubsystemStates() {
     intake.raise();
     intake.activate(Intake.Mode.OFF);
+    drivetrain.resetPose();
   }
 
   public Command getAuto() {
