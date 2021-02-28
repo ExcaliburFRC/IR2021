@@ -23,15 +23,14 @@ public final class Constants {
     public static final int RIGHT_FOLLOWER_ID = 12;
     public static final int LEFT_LEADER_ID = 13;
     public static final int LEFT_FOLLOWER_ID = 14;
-    public static final int CPR = 2046;
-    public static final double TRACK_WIDTH = 0.60; // TODO: tune
+    public static final double TRACK_WIDTH = 0.7089637790126834;
     public static final double WHEEL_RADIUS = Units.inchesToMeters(6);
     public static final double GEARING = 10.25;
-    public static final double kV_lin = 1.27, kA_lin = 0.197, kV_ang = 1.5, kA_ang = 0.3;
+    public static final double kV_lin = 2.66, kA_lin = 0.349, kV_ang = 2.76, kA_ang = -0.236;
     public static final double PULSE_TO_METER =
         1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
-    public static final double kP = 0.00385;
-    public static final double kS = 0.125; // TODO: tune
+    public static final double kP = 0.00256;
+    public static final double kS = 0.125, kS_ang = 0.285; // TODO: tune
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
@@ -39,15 +38,15 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int SHOOTER_ID = 41;
     public static final double TOLERANCE = 100; // TODO: tune
-    public static final double GEARING = 3; // TODO: tune
-    public static final double kS = 0.0, kV = 1.2, kA = 0.3; // TODO: tune
-    public static final double kP = 0.002, kF = 0.11;
+    public static final double GEARING = 2.0;
+    public static final double kS = 0.22, kV = 0.258, kA = 0.0972;
+    public static final double kP = 0.046;
   }
 
   public static final class TransporterConstants {
     public static final int FLICKER_ID = 33;
     public static final int LOADING_ID = 32;
-    public static final int LIMIT = 20;
+    public static final int LIMIT = 100;
   }
 
   public static final class ClimberConstants {

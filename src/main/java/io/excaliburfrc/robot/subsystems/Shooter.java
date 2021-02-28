@@ -7,6 +7,7 @@ import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.lib.SimSparkMax;
 
@@ -23,10 +24,12 @@ public class Shooter extends SubsystemBase {
     shooterMotor.setIdleMode(IdleMode.kCoast);
 
     encoder = shooterMotor.getEncoder();
+    encoder.setPositionConversionFactor(GEARING);
     encoder.setVelocityConversionFactor(GEARING);
 
     controller = shooterMotor.getPIDController();
     controller.setFeedbackDevice(encoder);
+    controller.setP(kP);
     ff = new SimpleMotorFeedforward(kS, kV, kA);
   }
 
@@ -58,5 +61,11 @@ public class Shooter extends SubsystemBase {
     ShooterSpeed(double i) {
       this.rpm = i;
     }
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("shooterVel", encoder.getVelocity());
+    SmartDashboard.putBoolean("isReady", isAtTargetVelocity());
   }
 }

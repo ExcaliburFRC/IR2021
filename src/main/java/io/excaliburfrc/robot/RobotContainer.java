@@ -1,5 +1,7 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.hal.CompressorJNI;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -34,6 +36,7 @@ public class RobotContainer {
 
   private final Joystick driveJoystick = new Joystick(0);
   private final Joystick armJoystick = new Joystick(1);
+  private final Compressor compressor = new Compressor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -61,11 +64,13 @@ public class RobotContainer {
     final int ejectButton = 4;
     final int openIntakeButton = 3;
     final int closeIntakeButton = 5;
-    final int startShootButton = 12;
+    final int startShootButton = 6;
     final int climberOpenButton = 7;
     final int climberCloseButton = 8;
     final int climberUpButton = 9;
     final int climberDownButton = 10;
+
+    final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(
         new RunCommand(
@@ -110,6 +115,9 @@ public class RobotContainer {
     new JoystickButton(armJoystick, shootButton)
         .whenPressed(() -> transporter.activate(Transporter.Mode.SHOOT), transporter)
         .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
+
+    new JoystickButton(armJoystick, compressorToggle)
+          .toggleWhenPressed(new StartEndCommand(()-> compressor.setClosedLoopControl(false), ()-> compressor.setClosedLoopControl(true)));
   }
 
   public void initSubsystemStates() {

@@ -8,6 +8,7 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Transporter extends SubsystemBase {
@@ -51,6 +52,12 @@ public class Transporter extends SubsystemBase {
   }
 
   public boolean isBallReady() {
-    return ballDetector.getProximity() < LIMIT;
+    return ballDetector.getProximity() > LIMIT;
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("prox", ballDetector.getProximity());
+    SmartDashboard.putBoolean("isReady", isBallReady());
   }
 }

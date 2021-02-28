@@ -62,9 +62,9 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder = rightLeader.getEncoder();
 
     leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
-    leftEncoder.setVelocityConversionFactor(PULSE_TO_METER / 42.0);
+    leftEncoder.setVelocityConversionFactor(PULSE_TO_METER);
     rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
-    rightEncoder.setVelocityConversionFactor(PULSE_TO_METER / 42.0);
+    rightEncoder.setVelocityConversionFactor(PULSE_TO_METER);
 
     leftController = leftLeader.getPIDController();
     rightController = rightLeader.getPIDController();
@@ -77,7 +77,7 @@ public class Drivetrain extends SubsystemBase {
     rightController.setD(0);
     rightController.setFF(0);
 
-    gyro = new AHRS();
+    gyro = new AHRS(SPI.Port.kMXP);
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
     drive.setRightSideInverted(false);
@@ -124,12 +124,12 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("gyro", gyro.getAngle());
     odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    System.out.println("odometry.getPoseMeters() = " + odometry.getPoseMeters());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
-    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
-    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
+    SmartDashboard.putNumber("RightEncoder", rightEncoder.getPosition());
+    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getPosition());
   }
 
   public void tankDrive(double left, double right) {
