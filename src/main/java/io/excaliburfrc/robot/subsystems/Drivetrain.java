@@ -9,7 +9,8 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.*;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -57,13 +58,17 @@ public class Drivetrain extends SubsystemBase {
     rightFollower.restoreFactoryDefaults();
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
+    leftLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
 
-    leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    leftEncoder.setPositionConversionFactor(1);
     leftEncoder.setVelocityConversionFactor(PULSE_TO_METER);
-    rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
+    rightEncoder.setPositionConversionFactor(1);
     rightEncoder.setVelocityConversionFactor(PULSE_TO_METER);
 
     leftController = leftLeader.getPIDController();
@@ -124,8 +129,8 @@ public class Drivetrain extends SubsystemBase {
     odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
-    SmartDashboard.putNumber("RightEncoder", rightEncoder.getPosition());
-    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getPosition());
+    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
+    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
   }
 
   public void tankDrive(double left, double right) {
@@ -156,12 +161,16 @@ public class Drivetrain extends SubsystemBase {
         path,
         () -> odometry.getPoseMeters(),
         new RamseteController(),
-        // new SimpleMotorFeedforward(kS, kV_lin),
+         new SimpleMotorFeedforward(kS, kV_lin),
         new DifferentialDriveKinematics(TRACK_WIDTH),
-        // () -> new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate()),
-        // new PIDController(kP, kI, kD),
-        // new PIDController(kP, kI, kD),
-        (left, right) -> setVelocityRefs(left, right),
+         () -> new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()),
+         new PIDController(kP, 0, 0),
+         new PIDController(kP, 0, 0),
+        (left, right) -> {
+          leftLeader.setVoltage(left);
+          rightLeader.setVoltage(right);
+          drive.feed();
+        },
         this);
   }
 
@@ -183,10 +192,11 @@ public class Drivetrain extends SubsystemBase {
         left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
     rightController.setReference(
         right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
+    SmartDashboard.putNumberArray("vel-setpoints", new double[]{left, right});
   }
 
   public void stop() {
-    setVelocityRefs(0,0);
+    setVelocityRefs(0, 0);
     leftLeader.stopMotor();
     rightLeader.stopMotor();
   }

@@ -1,6 +1,8 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
@@ -45,5 +47,12 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     m_robotContainer.initSubsystemStates();
     // init teleop
+  }
+
+  @Override
+  public void testPeriodic() {
+    var ref = -DriverStation.getInstance().getStickAxis(1, 1);
+    SmartDashboard.putNumber("speed-ms", ref);
+    m_robotContainer.drivetrain.setVelocityRefs(ref, -ref);
   }
 }

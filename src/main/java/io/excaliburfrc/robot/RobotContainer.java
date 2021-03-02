@@ -1,22 +1,21 @@
 package io.excaliburfrc.robot;
 
-import edu.wpi.first.hal.CompressorJNI;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.commands.auto.SlalumAuto;
 import io.excaliburfrc.robot.subsystems.*;
-import java.io.IOException;
-import java.nio.file.Path;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,7 +37,9 @@ public class RobotContainer {
   private final Joystick armJoystick = new Joystick(1);
   private final Compressor compressor = new Compressor();
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     chooser.setDefaultOption("Nothing", new InstantCommand());
     chooser.addOption("Slalum", new SlalumAuto(drivetrain).getCommand());
@@ -73,51 +74,54 @@ public class RobotContainer {
     final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(
-        new RunCommand(
-            () ->
-                drivetrain.arcade(
-                    driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis) * -1),
-            drivetrain));
+          new RunCommand(
+                () ->
+                      drivetrain.arcade(
+                            driveJoystick.getRawAxis(forwardDriveAxis),
+                            driveJoystick.getRawAxis(rotateDriveAxis) * -1),
+                drivetrain));
 
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
-        .whenReleased(() -> intake.stop(), intake);
+          .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
+          .whenReleased(() -> intake.stop(), intake);
     new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.lower(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
 
     new JoystickButton(armJoystick, startShootButton)
-        .toggleWhenPressed(
-            new StartEndCommand(
-                () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
+          .toggleWhenPressed(
+                new StartEndCommand(
+                      () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
 
     new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
     new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
 
     new JoystickButton(armJoystick, climberUpButton)
-        .whileHeld(() -> climber.up(), climber)
-        .whenReleased(() -> climber.stopMotor(), climber);
+          .whileHeld(() -> climber.up(), climber)
+          .whenReleased(() -> climber.stopMotor(), climber);
 
     new JoystickButton(armJoystick, climberDownButton)
-        .whileHeld(() -> climber.down(), climber)
-        .whenReleased(() -> climber.stopMotor(), climber);
+          .whileHeld(() -> climber.down(), climber)
+          .whenReleased(() -> climber.stopMotor(), climber);
 
     // TODO: merge with intake
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.IN), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
+          .whenPressed(() -> transporter.activate(Transporter.Mode.IN), transporter)
+          .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
 
     new JoystickButton(armJoystick, ejectButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.OUT), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
+          .whenPressed(() -> transporter.activate(Transporter.Mode.OUT), transporter)
+          .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
 
     // TODO: merge with shooter
     new JoystickButton(armJoystick, shootButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.SHOOT), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
+          .whenPressed(() -> transporter.activate(Transporter.Mode.SHOOT), transporter)
+          .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
 
     new JoystickButton(armJoystick, compressorToggle)
-          .toggleWhenPressed(new StartEndCommand(()-> compressor.setClosedLoopControl(false), ()-> compressor.setClosedLoopControl(true)));
+          .toggleWhenPressed(
+                new StartEndCommand(
+                      () -> compressor.setClosedLoopControl(false),
+                      () -> compressor.setClosedLoopControl(true)));
   }
 
   public void initSubsystemStates() {
@@ -127,52 +131,58 @@ public class RobotContainer {
   }
 
   public Command getAuto() {
-    return chooser.getSelected();
+    Trajectory traj = TrajectoryGenerator.generateTrajectory(
+          new Pose2d(0, 0, new Rotation2d(0.0)),
+          List.of(new Translation2d(1, 0)),
+          new Pose2d(3, 0, new Rotation2d(0)), new TrajectoryConfig(3, 3)
+    );
+    return drivetrain.ramseteGroup(traj);
+//    return chooser.getSelected();
   }
 
-//  /** @deprecated - move to separate classes */
-//  @Deprecated
-//  public enum AutoPath {
-//    Slalum("slalum"),
-//    Barrel("barrel"),
-//    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
-//
-//    private static final Path outputDir =
-//        Filesystem.getDeployDirectory().toPath().resolve("output");
-//
-//    private final List<String> files;
-//    private Optional<Trajectory> trajectory = Optional.empty();
-//
-//    AutoPath(String... files) {
-//      this.files = Arrays.asList(files);
-//    }
-//
-//    public Pose2d getStartingPose() {
-//      return getTrajectory().getInitialPose();
-//    }
-//
-//    public Trajectory getTrajectory() {
-//      if (trajectory.isPresent()) return trajectory.get();
-//      if (files.size() == 1) {
-//        var res = getTrajectoryFile(files.get(0));
-//        trajectory = Optional.of(res);
-//        return res;
-//      }
-//      var res =
-//          new Trajectory(
-//              files.stream()
-//                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
-//                  .collect(Collectors.toList()));
-//      trajectory = Optional.of(res);
-//      return res;
-//    }
-//
-//    private static Trajectory getTrajectoryFile(String filename) {
-//      try {
-//        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
-//      } catch (IOException iox) {
-//        throw new RuntimeException(iox);
-//      }
-//    }
-//  }
+  //  /** @deprecated - move to separate classes */
+  //  @Deprecated
+  //  public enum AutoPath {
+  //    Slalum("slalum"),
+  //    Barrel("barrel"),
+  //    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
+  //
+  //    private static final Path outputDir =
+  //        Filesystem.getDeployDirectory().toPath().resolve("output");
+  //
+  //    private final List<String> files;
+  //    private Optional<Trajectory> trajectory = Optional.empty();
+  //
+  //    AutoPath(String... files) {
+  //      this.files = Arrays.asList(files);
+  //    }
+  //
+  //    public Pose2d getStartingPose() {
+  //      return getTrajectory().getInitialPose();
+  //    }
+  //
+  //    public Trajectory getTrajectory() {
+  //      if (trajectory.isPresent()) return trajectory.get();
+  //      if (files.size() == 1) {
+  //        var res = getTrajectoryFile(files.get(0));
+  //        trajectory = Optional.of(res);
+  //        return res;
+  //      }
+  //      var res =
+  //          new Trajectory(
+  //              files.stream()
+  //                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
+  //                  .collect(Collectors.toList()));
+  //      trajectory = Optional.of(res);
+  //      return res;
+  //    }
+  //
+  //    private static Trajectory getTrajectoryFile(String filename) {
+  //      try {
+  //        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
+  //      } catch (IOException iox) {
+  //        throw new RuntimeException(iox);
+  //      }
+  //    }
+  //  }
 }

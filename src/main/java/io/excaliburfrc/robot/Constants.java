@@ -57,4 +57,6 @@ public final class Constants {
     public static final double UP_SPEED = 0.6;
     public static final double DOWN_SPEED = -0.4;
   }
+
+  public static final int LED_PORT = 4;
 }

@@ -28,11 +28,13 @@ public class CANPIDControllerSim extends CANPIDController implements Runnable {
   }
 
   @Override
-  public CANError setReference(double value, ControlType ctrl, int slot, double ff, ArbFFUnits ffUnits) {
+  public CANError setReference(
+      double value, ControlType ctrl, int slot, double ff, ArbFFUnits ffUnits) {
     this.refType = ctrl;
     this.ref = value;
     input = simDevice.getDouble(ctrlToKey(ctrl, alt));
-    feedforward = ff / ((ffUnits == ArbFFUnits.kPercentOut)? 1.0 : RobotController.getInputVoltage());
+    feedforward =
+        ff / ((ffUnits == ArbFFUnits.kPercentOut) ? 1.0 : RobotController.getInputVoltage());
 
     return CANError.kOk;
   }
