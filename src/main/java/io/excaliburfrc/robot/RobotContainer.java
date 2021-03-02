@@ -130,49 +130,49 @@ public class RobotContainer {
     return chooser.getSelected();
   }
 
-  /** @deprecated - move to separate classes */
-  @Deprecated
-  public enum AutoPath {
-    Slalum("slalum"),
-    Barrel("barrel"),
-    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
-
-    private static final Path outputDir =
-        Filesystem.getDeployDirectory().toPath().resolve("output");
-
-    private final List<String> files;
-    private Optional<Trajectory> trajectory = Optional.empty();
-
-    AutoPath(String... files) {
-      this.files = Arrays.asList(files);
-    }
-
-    public Pose2d getStartingPose() {
-      return getTrajectory().getInitialPose();
-    }
-
-    public Trajectory getTrajectory() {
-      if (trajectory.isPresent()) return trajectory.get();
-      if (files.size() == 1) {
-        var res = getTrajectoryFile(files.get(0));
-        trajectory = Optional.of(res);
-        return res;
-      }
-      var res =
-          new Trajectory(
-              files.stream()
-                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
-                  .collect(Collectors.toList()));
-      trajectory = Optional.of(res);
-      return res;
-    }
-
-    private static Trajectory getTrajectoryFile(String filename) {
-      try {
-        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
-      } catch (IOException iox) {
-        throw new RuntimeException(iox);
-      }
-    }
-  }
+//  /** @deprecated - move to separate classes */
+//  @Deprecated
+//  public enum AutoPath {
+//    Slalum("slalum"),
+//    Barrel("barrel"),
+//    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
+//
+//    private static final Path outputDir =
+//        Filesystem.getDeployDirectory().toPath().resolve("output");
+//
+//    private final List<String> files;
+//    private Optional<Trajectory> trajectory = Optional.empty();
+//
+//    AutoPath(String... files) {
+//      this.files = Arrays.asList(files);
+//    }
+//
+//    public Pose2d getStartingPose() {
+//      return getTrajectory().getInitialPose();
+//    }
+//
+//    public Trajectory getTrajectory() {
+//      if (trajectory.isPresent()) return trajectory.get();
+//      if (files.size() == 1) {
+//        var res = getTrajectoryFile(files.get(0));
+//        trajectory = Optional.of(res);
+//        return res;
+//      }
+//      var res =
+//          new Trajectory(
+//              files.stream()
+//                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
+//                  .collect(Collectors.toList()));
+//      trajectory = Optional.of(res);
+//      return res;
+//    }
+//
+//    private static Trajectory getTrajectoryFile(String filename) {
+//      try {
+//        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
+//      } catch (IOException iox) {
+//        throw new RuntimeException(iox);
+//      }
+//    }
+//  }
 }

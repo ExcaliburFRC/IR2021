@@ -86,7 +86,7 @@ public class Drivetrain extends SubsystemBase {
 
     if (RobotBase.isSimulation()) {
       simLeftEncoder = new CANEncoderSim(false, LEFT_LEADER_ID);
-      // simRightEncoder = new EncoderSim(rightEncoder);
+      simRightEncoder = new CANEncoderSim(false, RIGHT_LEADER_ID);
       simGyro =
           new SimDouble(
               SimDeviceDataJNI.getSimValueHandle(
@@ -109,14 +109,10 @@ public class Drivetrain extends SubsystemBase {
 
     simDrive.update(0.02);
 
-    var leftPositionMeters = simDrive.getLeftPositionMeters();
-    // simLeftEncoder.setDistance(leftPositionMeters);
-    // System.out.println(leftEncoder.getDistance() == leftPositionMeters);
-    // var rightPositionMeters = simDrive.getRightPositionMeters();
-    // simRightEncoder.setDistance(rightPositionMeters);
-    // System.out.println(rightEncoder.getDistance() == rightPositionMeters);
-    // simLeftEncoder.setRate(simDrive.getLeftVelocityMetersPerSecond());
-    // simRightEncoder.setRate(simDrive.getRightVelocityMetersPerSecond());
+    simLeftEncoder.setPosition(simDrive.getLeftPositionMeters());
+    simLeftEncoder.setVelocity(simDrive.getLeftVelocityMetersPerSecond());
+    simRightEncoder.setPosition(simDrive.getRightPositionMeters());
+    simRightEncoder.setVelocity(simDrive.getRightPositionMeters());
     simGyro.set(-simDrive.getHeading().getDegrees());
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
@@ -154,6 +150,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * <p>Teardown: <code>new InstantCommand(()->this.arcade(0,0), this)</code>
    */
+  @SuppressWarnings("Convert2MethodRef")
   public RamseteCommand ramsete(Trajectory path) {
     return new RamseteCommand(
         path,
@@ -186,5 +183,11 @@ public class Drivetrain extends SubsystemBase {
         left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
     rightController.setReference(
         right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
+  }
+
+  public void stop() {
+    setVelocityRefs(0,0);
+    leftLeader.stopMotor();
+    rightLeader.stopMotor();
   }
 }

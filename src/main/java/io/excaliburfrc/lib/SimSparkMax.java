@@ -1,12 +1,17 @@
 package io.excaliburfrc.lib;
 
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.hal.SimDouble;
+import com.revrobotics.ControlType;
+import com.revrobotics.jni.CANSparkMaxJNI;
+import edu.wpi.first.hal.simulation.SimulatorJNI;
+import edu.wpi.first.hal.simulation.SimulatorJNI.SimPeriodicBeforeCallback;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 
 public class SimSparkMax extends CANSparkMax {
-  private final SimDouble simappliedOutput;
+  private SimPeriodicBeforeCallback callback;
+  private final SimDeviceSim simDevice;
 
   /**
    * Create a new SPARK MAX Controller
@@ -19,16 +24,32 @@ public class SimSparkMax extends CANSparkMax {
   public SimSparkMax(int deviceID, MotorType type) {
     super(deviceID, type);
     if (RobotBase.isSimulation()) {
-      simappliedOutput =
-          new SimDeviceSim("SPARK MAX [" + deviceID + "]").getDouble("Applied Output");
-    } else simappliedOutput = null;
+      simDevice = new SimDeviceSim("SPARK MAX [" + deviceID + "]");
+    } else {
+      simDevice = null;
+    }
   }
 
   @Override
   public void set(double speed) {
-    if (RobotBase.isSimulation()) {
-      simappliedOutput.set(speed);
+    getPIDController().setReference(speed, ControlType.kDutyCycle);
+  }
+
+  @Override
+  public void close() {
+    if (callback != null) {
+      callback.close();
     }
-    super.set(speed);
+    super.close();
+    CANSparkMaxJNI.c_SparkMax_Destroy(m_sparkMax);
+  }
+
+  @Override
+  public CANPIDController getPIDController() {
+    if (RobotBase.isSimulation()) {
+      var controller = new CANPIDControllerSim(this, simDevice);
+      callback = SimulatorJNI.registerSimPeriodicBeforeCallback(controller);
+      return controller;
+    } else return super.getPIDController();
   }
 }
