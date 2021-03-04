@@ -133,7 +133,7 @@ public class RobotContainer {
   public Command getAuto() {
     Trajectory traj = TrajectoryGenerator.generateTrajectory(
           new Pose2d(0, 0, new Rotation2d(0.0)),
-          List.of(new Translation2d(1, 0)),
+          List.of(),
           new Pose2d(3, 0, new Rotation2d(0)), new TrajectoryConfig(3, 3)
     );
     return drivetrain.ramseteGroup(traj);

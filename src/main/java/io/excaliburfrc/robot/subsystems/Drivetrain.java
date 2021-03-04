@@ -56,20 +56,22 @@ public class Drivetrain extends SubsystemBase {
     rightLeader.restoreFactoryDefaults();
     leftFollower.restoreFactoryDefaults();
     rightFollower.restoreFactoryDefaults();
+    rightLeader.setInverted(true);
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
     leftLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
     leftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    rightLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
 
-    leftEncoder.setPositionConversionFactor(1);
+    leftEncoder.setPositionConversionFactor(PULSE_TO_METER);
     leftEncoder.setVelocityConversionFactor(PULSE_TO_METER);
-    rightEncoder.setPositionConversionFactor(1);
+    rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
     rightEncoder.setVelocityConversionFactor(PULSE_TO_METER);
+
 
     leftController = leftLeader.getPIDController();
     rightController = rightLeader.getPIDController();
@@ -85,7 +87,7 @@ public class Drivetrain extends SubsystemBase {
     gyro = new AHRS(SPI.Port.kMXP);
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
-    drive.setRightSideInverted(false);
+    drive.setRightSideInverted(true);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
 
@@ -129,8 +131,8 @@ public class Drivetrain extends SubsystemBase {
     odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
-    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
-    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
+    SmartDashboard.putNumber("RightEncoder", rightEncoder.getPosition());
+    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getPosition());
   }
 
   public void tankDrive(double left, double right) {

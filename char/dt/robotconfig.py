@@ -18,7 +18,7 @@
     # For the REV Through Bore Encoder, use 8192 (2048 * 4)
     "encoderEPR": 1,
     # Gearing accounts for the gearing between the encoder and the output shaft
-    "gearing": 10.25,
+    "gearing": 10.71,
     # Set this to True if you would like to use the SparkMax Data Port
     # Note that the Data Port is the 10 pin port on the top of the SparkMax
     # Setting this to False indicates you want to use the 6 pin encoder port
@@ -32,9 +32,9 @@
     "rightEncoderPorts": [],
     # Set to True if encoders need to be inverted
     # If doing drive test, treat this as the left side of the drivetrain
-    "encoderInverted": False,
+    "encoderInverted": True,
     # Only if you are doing drive (set to False if not needed)
-    "rightEncoderInverted": True,
+    "rightEncoderInverted": False,
     # ** The following is only if you are using a gyro for the DriveTrain test**
     # Gyro type (one of "NavX", "Pigeon", "ADXRS450", "AnalogGyro", or "None")
     "gyroType": "NavX",
@@ -48,4 +48,10 @@
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
     "gyroPort": "",
 }
+
+
+
+
+
+
 
