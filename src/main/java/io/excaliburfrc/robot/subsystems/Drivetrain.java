@@ -88,6 +88,7 @@ public class Drivetrain extends SubsystemBase {
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
     drive.setRightSideInverted(true);
+//    drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
 
@@ -204,7 +205,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void stop() {
-    setVelocityRefs(0, 0);
+//    setVelocityRefs(0, 0);
     leftLeader.stopMotor();
     rightLeader.stopMotor();
   }

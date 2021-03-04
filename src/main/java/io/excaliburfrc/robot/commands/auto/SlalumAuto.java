@@ -30,11 +30,11 @@ public class SlalumAuto {
         new SequentialCommandGroup(
             new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
             drive.ramsete(traj),
-            new InstantCommand(() -> drive.arcade(0, 0), drive));
+            new InstantCommand(drive::stop, drive));
   }
 
   public Command getCommand() {
-    System.out.println(traj);
+//    System.out.println(traj);
     return command;
   }
 }
