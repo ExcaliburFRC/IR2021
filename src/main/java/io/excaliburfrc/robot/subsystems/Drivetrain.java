@@ -72,7 +72,6 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder.setPositionConversionFactor(PULSE_TO_METER);
     rightEncoder.setVelocityConversionFactor(PULSE_TO_METER / 60.);
 
-
     leftController = leftLeader.getPIDController();
     rightController = rightLeader.getPIDController();
     leftController.setP(kP);
@@ -88,7 +87,6 @@ public class Drivetrain extends SubsystemBase {
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
     drive.setRightSideInverted(true);
-//    drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
 
@@ -96,17 +94,17 @@ public class Drivetrain extends SubsystemBase {
       simLeftEncoder = new CANEncoderSim(false, LEFT_LEADER_ID);
       simRightEncoder = new CANEncoderSim(false, RIGHT_LEADER_ID);
       simGyro =
-            new SimDouble(
-                  SimDeviceDataJNI.getSimValueHandle(
-                        SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]"), "Yaw"));
+          new SimDouble(
+              SimDeviceDataJNI.getSimValueHandle(
+                  SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]"), "Yaw"));
       simDrive =
-            new DifferentialDrivetrainSim(
-                  LinearSystemId.identifyDrivetrainSystem(kV_lin, kA_lin, kV_ang, kA_ang),
-                  DCMotor.getNEO(2),
-                  GEARING,
-                  TRACK_WIDTH,
-                  WHEEL_RADIUS,
-                  null);
+          new DifferentialDrivetrainSim(
+              LinearSystemId.identifyDrivetrainSystem(kV_lin, kA_lin, kV_ang, kA_ang),
+              DCMotor.getNEO(2),
+              GEARING,
+              TRACK_WIDTH,
+              WHEEL_RADIUS,
+              null);
     }
   }
 
@@ -123,7 +121,7 @@ public class Drivetrain extends SubsystemBase {
     simRightEncoder.setVelocity(simDrive.getRightPositionMeters());
     simGyro.set(-simDrive.getHeading().getDegrees());
     RoboRioSim.setVInVoltage(
-          BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(simDrive.getCurrentDrawAmps()));
   }
 
   @Override
@@ -146,9 +144,9 @@ public class Drivetrain extends SubsystemBase {
 
   public Command ramseteGroup(Trajectory path) {
     return new SequentialCommandGroup(
-          new InstantCommand(() -> resetPose(path.getInitialPose()), this), // reset pose before
-          ramsete(path),
-          new InstantCommand(() -> this.arcade(0, 0), this)); // stop after
+        new InstantCommand(() -> resetPose(path.getInitialPose()), this), // reset pose before
+        ramsete(path),
+        new InstantCommand(() -> this.arcade(0, 0), this)); // stop after
   }
 
   /**
@@ -161,26 +159,29 @@ public class Drivetrain extends SubsystemBase {
   @SuppressWarnings("Convert2MethodRef")
   public RamseteCommand ramsete(Trajectory path) {
     return new RamseteCommand(
-          path,
-          () -> odometry.getPoseMeters(),
-          new RamseteController(),
-          new SimpleMotorFeedforward(kS, kV_lin, kA_lin),
-          new DifferentialDriveKinematics(TRACK_WIDTH),
-          () -> {
-            var whl = new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
-            SmartDashboard.putNumberArray("wheelspeeds", new double[]{whl.leftMetersPerSecond, whl.rightMetersPerSecond});
-            return whl;
-          },
-          new PIDController(kP, 0, 0),
-          new PIDController(kP, 0, 0),
-          (left, right) -> {
-            SmartDashboard.putNumber("left", left);
-            SmartDashboard.putNumber("right", right);
-            leftLeader.setVoltage(left);
-            rightLeader.setVoltage(right);
-            drive.feed();
-          },
-          this);
+        path,
+        () -> odometry.getPoseMeters(),
+        new RamseteController(),
+        new SimpleMotorFeedforward(kS, kV_lin, kA_lin),
+        new DifferentialDriveKinematics(TRACK_WIDTH),
+        () -> {
+          var whl =
+              new DifferentialDriveWheelSpeeds(
+                  leftEncoder.getVelocity(), rightEncoder.getVelocity());
+          SmartDashboard.putNumberArray(
+              "wheelspeeds", new double[] {whl.leftMetersPerSecond, whl.rightMetersPerSecond});
+          return whl;
+        },
+        new PIDController(kP, 0, 0),
+        new PIDController(kP, 0, 0),
+        (left, right) -> {
+          SmartDashboard.putNumber("left", left);
+          SmartDashboard.putNumber("right", right);
+          leftLeader.setVoltage(left);
+          rightLeader.setVoltage(right);
+          drive.feed();
+        },
+        this);
   }
 
   public void resetPose(Pose2d pose) {
@@ -198,14 +199,13 @@ public class Drivetrain extends SubsystemBase {
 
   public void setVelocityRefs(double left, double right) {
     leftController.setReference(
-          left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
+        left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
     rightController.setReference(
-          right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
-    SmartDashboard.putNumberArray("vel-setpoints", new double[]{left, right});
+        right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
+    SmartDashboard.putNumberArray("vel-setpoints", new double[] {left, right});
   }
 
   public void stop() {
-//    setVelocityRefs(0, 0);
     leftLeader.stopMotor();
     rightLeader.stopMotor();
   }

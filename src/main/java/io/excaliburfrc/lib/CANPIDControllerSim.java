@@ -19,8 +19,8 @@ public class CANPIDControllerSim extends CANPIDController implements Runnable {
   private double feedforward = 0.0;
   private boolean alt = false;
 
+  @SuppressWarnings("removal")
   public CANPIDControllerSim(SimSparkMax device, SimDeviceSim simDevice) {
-    //noinspection removal
     super(device);
     this.device = device;
     this.simDevice = simDevice;

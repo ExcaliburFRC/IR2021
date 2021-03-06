@@ -86,6 +86,7 @@ jar {
 spotless {
     lineEndings 'UNIX'
     java {
+        removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
         indentWithSpaces(2)
