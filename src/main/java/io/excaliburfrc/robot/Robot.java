@@ -1,6 +1,9 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
@@ -17,6 +20,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+//    LiveWindow.disableAllTelemetry();
     // Instantiate our RobotContainer. This will perform all our button bindings
     m_robotContainer = new RobotContainer();
   }
@@ -43,6 +47,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.initSubsystemStates();
     // init teleop
+  }
+
+  @Override
+  public void testPeriodic() {
+    var ref = -DriverStation.getInstance().getStickAxis(1, 1);
+    SmartDashboard.putNumber("speed-ms", ref);
+    m_robotContainer.drivetrain.setVelocityRefs(ref, ref);
   }
 }
