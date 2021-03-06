@@ -1,4 +1,4 @@
-package io.excaliburfrc.robot.commands.auto;
+package io.excaliburfrc.robot.commands.autonav;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import java.io.IOException;
 
-public class SlalumAuto {
+public class Slalum {
   private final Command command;
   private Trajectory traj;
 
-  public SlalumAuto(Drivetrain drive) {
+  public Slalum(Drivetrain drive) {
     try {
       traj =
           TrajectoryUtil.fromPathweaverJson(
@@ -30,11 +30,10 @@ public class SlalumAuto {
         new SequentialCommandGroup(
             new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
             drive.ramsete(traj),
-            new InstantCommand(drive::stop, drive));
+            new InstantCommand(() -> drive.stop(), drive));
   }
 
   public Command getCommand() {
-//    System.out.println(traj);
     return command;
   }
 }
