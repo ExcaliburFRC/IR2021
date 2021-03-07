@@ -58,5 +58,8 @@ public final class Constants {
     public static final double DOWN_SPEED = -0.4;
   }
 
+  public static final int LIMELIGHT_REV = 2;
+  public static final int LIMELIGHT_FWD = 3;
+
   public static final int LED_PORT = 4;
 }
