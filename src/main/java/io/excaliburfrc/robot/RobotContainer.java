@@ -32,7 +32,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     chooser.setDefaultOption("Nothing", new InstantCommand());
-    chooser.addOption("Slalum", new Slalum(drivetrain).getCommand());
+    chooser.addOption("Slalum", new Slalum(drivetrain));
     SmartDashboard.putData("Auto", chooser);
     // Configure the button bindings
     configureButtonBindings();
