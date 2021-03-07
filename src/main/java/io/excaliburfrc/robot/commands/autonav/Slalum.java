@@ -8,21 +8,18 @@ import io.excaliburfrc.robot.subsystems.Drivetrain;
 import java.io.IOException;
 
 public class Slalum extends SequentialCommandGroup {
-  private Trajectory traj;
-
   public Slalum(Drivetrain drive) {
     try {
-      traj =
+      Trajectory traj =
           TrajectoryUtil.fromPathweaverJson(
               Filesystem.getDeployDirectory()
                   .toPath()
                   .resolve("output")
                   .resolve("slalum.wpilib.json"));
       addCommands(
-              new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
-              drive.ramsete(traj),
-              new InstantCommand(() -> drive.stop(), drive)
-      );
+          new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
+          drive.ramsete(traj),
+          new InstantCommand(() -> drive.stop(), drive));
     } catch (IOException e) {
       DriverStation.reportError(e.getMessage(), e.getStackTrace());
     }
