@@ -56,4 +56,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void stop() {
     intakeMotor.set(Mode.OFF.speed);
   }
+
+  public void _DebugSet(double x) {
+    intakeMotor.set(x);
+  }
 }

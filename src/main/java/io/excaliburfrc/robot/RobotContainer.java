@@ -22,6 +22,7 @@ public class RobotContainer {
   public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
   public final Climber climber = new Climber();
+  public final Vision vision = new Vision();
 
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
@@ -60,7 +61,6 @@ public class RobotContainer {
     final int climberCloseButton = 8;
     final int climberUpButton = 9;
     final int climberDownButton = 10;
-
     final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(

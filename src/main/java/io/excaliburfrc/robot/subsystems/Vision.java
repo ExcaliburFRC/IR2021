@@ -1,6 +1,9 @@
 package io.excaliburfrc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.lib.vision.Limelight;
 import io.excaliburfrc.lib.vision.Limelight.DataKey;
@@ -9,23 +12,21 @@ import io.excaliburfrc.robot.Constants;
 
 public class Vision extends SubsystemBase {
   private final Limelight limelight;
-  private final DoubleSolenoid piston;
+  private final PWM servo;
 
   private static final int POWER_PORT_PIPELINE = 1;
   private static final int POWER_CELL_PIPELINE = 2;
 
   public Vision() {
     limelight = new Limelight();
-    piston = new DoubleSolenoid(Constants.LIMELIGHT_FWD, Constants.LIMELIGHT_REV);
+    servo = new PWM(Constants.LL_SERVO);
   }
 
   public void raise() {
-    piston.set(DoubleSolenoid.Value.kReverse);
     limelight.setData(SettingsKey.ActivePipeline, POWER_PORT_PIPELINE);
   }
 
   public void lower() {
-    piston.set(DoubleSolenoid.Value.kForward);
     limelight.setData(SettingsKey.ActivePipeline, POWER_CELL_PIPELINE);
   }
 
@@ -38,4 +39,12 @@ public class Vision extends SubsystemBase {
     return limelight.getData(DataKey.XOffset);
   }
 
+  public void _DebugServoControl(double position) {
+    servo.setPosition(position);
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("LL Servo", servo.getPosition());
+  }
 }
