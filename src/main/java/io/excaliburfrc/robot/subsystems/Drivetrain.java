@@ -87,6 +87,7 @@ public class Drivetrain extends SubsystemBase {
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
     drive.setRightSideInverted(true);
+    drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
 
