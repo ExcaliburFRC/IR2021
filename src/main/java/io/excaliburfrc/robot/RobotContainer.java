@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import io.excaliburfrc.robot.commands.autonav.Slalum;
 import io.excaliburfrc.robot.subsystems.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,7 +19,7 @@ import io.excaliburfrc.robot.subsystems.*;
 public class RobotContainer {
   // The robot's subsystems, as `public final`
   public final Intake intake = new Intake();
-  private final Shooter shooter = new Shooter();
+  public final Shooter shooter = new Shooter();
   public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
   public final Climber climber = new Climber();
@@ -39,6 +40,10 @@ public class RobotContainer {
     configureButtonBindings();
     initSubsystemStates();
   }
+
+  private static final int kArcadeDrive = 0;
+  private static final int kTankDrive = 1;
+  private final AtomicInteger mode = new AtomicInteger(0);
 
   @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
@@ -65,11 +70,18 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(
         new RunCommand(
-            () ->
+            () -> {
+              if (mode.get() % 2 == 0)
                 drivetrain.arcade(
                     driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis) * -1),
+                    driveJoystick.getRawAxis(rotateDriveAxis) * -1);
+              else
+                drivetrain.tankDrive(
+                    -driveJoystick.getRawAxis(rotateDriveAxis), driveJoystick.getRawAxis(5));
+            },
             drivetrain));
+
+    new JoystickButton(driveJoystick, 10).whenPressed(mode::incrementAndGet);
 
     new JoystickButton(armJoystick, inButton)
         .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
@@ -112,61 +124,20 @@ public class RobotContainer {
             new StartEndCommand(
                 () -> compressor.setClosedLoopControl(false),
                 () -> compressor.setClosedLoopControl(true)));
+
+    new JoystickButton(driveJoystick, 3)
+        .toggleWhenPressed(
+            new InstantCommand(() -> vision.goTo(Vision.Mode.BALL, Vision.CameraPosition.FORWARD)));
   }
 
   public void initSubsystemStates() {
     intake.raise();
     intake.activate(Intake.Mode.OFF);
     drivetrain.resetPose();
+    vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD);
   }
 
   public Command getAuto() {
     return chooser.getSelected();
   }
-
-  //  /** @deprecated - move to separate classes */
-  //  @Deprecated
-  //  public enum AutoPath {
-  //    Slalum("slalum"),
-  //    Barrel("barrel"),
-  //    Bounce("bounce", "bounce1", "bounce2", "bounce3", "bounce4");
-  //
-  //    private static final Path outputDir =
-  //        Filesystem.getDeployDirectory().toPath().resolve("output");
-  //
-  //    private final List<String> files;
-  //    private Optional<Trajectory> trajectory = Optional.empty();
-  //
-  //    AutoPath(String... files) {
-  //      this.files = Arrays.asList(files);
-  //    }
-  //
-  //    public Pose2d getStartingPose() {
-  //      return getTrajectory().getInitialPose();
-  //    }
-  //
-  //    public Trajectory getTrajectory() {
-  //      if (trajectory.isPresent()) return trajectory.get();
-  //      if (files.size() == 1) {
-  //        var res = getTrajectoryFile(files.get(0));
-  //        trajectory = Optional.of(res);
-  //        return res;
-  //      }
-  //      var res =
-  //          new Trajectory(
-  //              files.stream()
-  //                  .flatMap(file -> AutoPath.getTrajectoryFile(file).getStates().stream())
-  //                  .collect(Collectors.toList()));
-  //      trajectory = Optional.of(res);
-  //      return res;
-  //    }
-  //
-  //    private static Trajectory getTrajectoryFile(String filename) {
-  //      try {
-  //        return TrajectoryUtil.fromPathweaverJson(outputDir.resolve(filename + ".wpilib.json"));
-  //      } catch (IOException iox) {
-  //        throw new RuntimeException(iox);
-  //      }
-  //    }
-  //  }
 }

@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   static private int ENCODER_EDGES_PER_REV = 1 / 4;
   static private int PIDIDX = 0;
   static private int ENCODER_EPR = 1;
-  static private double GEARING = 2;
+  static private double GEARING = 1;
   
   private double encoderConstant = (1 / GEARING);
 
