@@ -1,4 +1,4 @@
-    {
+{
     # Set to True if the spark max will be brushed
     # ** WARNING: Improperly setting this can break things **
     "brushed": False,
@@ -18,7 +18,7 @@
     # For the REV Through Bore Encoder, use 8192 (2048 * 4)
     "encoderEPR": 1,
     # Gearing accounts for the gearing between the encoder and the output shaft
-    "gearing": 2,
+    "gearing": 1,
     # Set this to True if you would like to use the SparkMax Data Port
     # Note that the Data Port is the 10 pin port on the top of the SparkMax
     # Setting this to False indicates you want to use the 6 pin encoder port
@@ -48,4 +48,6 @@
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
     "gyroPort": "",
 }
+
+
 
