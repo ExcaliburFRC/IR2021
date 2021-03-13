@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2021.2.2"
     id "com.diffplug.spotless" version "5.9.0"
+    id "org.jetbrains.kotlin.jvm" version "1.4.31"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -82,7 +83,12 @@ jar {
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
 
+compileKotlin {
+     kotlinOptions{
+         jvmTarget = "1.8"
 
+    }
+}
 spotless {
     lineEndings 'UNIX'
     ratchetFrom 'origin/main'
