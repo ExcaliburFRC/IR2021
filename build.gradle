@@ -86,9 +86,9 @@ jar {
 compileKotlin {
      kotlinOptions{
          jvmTarget = "1.8"
-
     }
 }
+
 spotless {
     lineEndings 'UNIX'
     ratchetFrom 'origin/main'
@@ -98,5 +98,11 @@ spotless {
         endWithNewline()
         indentWithSpaces(2)
         googleJavaFormat()
+    }
+    kotlin {
+        trimTrailingWhitespace()
+        endWithNewline()
+        indentWithSpaces(2)
+        ktfmt()
     }
 }
