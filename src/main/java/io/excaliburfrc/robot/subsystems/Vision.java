@@ -73,7 +73,7 @@ public class Vision extends SubsystemBase {
     currentMode = mode;
     switch (mode) {
       case BALL:
-        limelight.setLED(LEDMode.kDefault);
+        limelight.setLED(LEDMode.kOn);
         limelight.setDriverMode(false);
         limelight.setPipelineIndex(POWER_CELL_PIPELINE);
         break;
@@ -82,7 +82,7 @@ public class Vision extends SubsystemBase {
         limelight.setDriverMode(true);
         break;
       case TARGET:
-        limelight.setLED(LEDMode.kDefault);
+        limelight.setLED(LEDMode.kOn);
         limelight.setDriverMode(false);
         limelight.setPipelineIndex(POWER_PORT_PIPELINE);
         break;
