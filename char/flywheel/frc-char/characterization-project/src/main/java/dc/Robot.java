@@ -1,9 +1,9 @@
 /**
- * This is a very simple robot program that can be used to send telemetry to
- * the data_logger script to characterize your drivetrain. If you wish to use
- * your actual robot code, you only need to implement the simple logic in the
- * autonomousPeriodic function and change the NetworkTables update rate
- */
+* This is a very simple robot program that can be used to send telemetry to
+* the data_logger script to characterize your drivetrain. If you wish to use
+* your actual robot code, you only need to implement the simple logic in the
+* autonomousPeriodic function and change the NetworkTables update rate
+*/
 
 package dc;
 
@@ -51,24 +51,16 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 
 public class Robot extends TimedRobot {
 
-  /*
-   CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   if using frc-char (tkinter) - false
-   if using sysid (imgui) - true
-   */
-  public static boolean IS_SYSID = false;
-
-
-  static private int ENCODER_EDGES_PER_REV = 1 / 4;
+  static private int ENCODER_EDGES_PER_REV = 1024 / 4;
   static private int PIDIDX = 0;
-  static private int ENCODER_EPR = 1;
-  static private double GEARING = 1;
-
-  private double encoderConstant = (1 / GEARING);
+  static private int ENCODER_EPR = 1024;
+  static private double GEARING = 2.111111111111111;
+  
+  private double encoderConstant = GEARING / ENCODER_EPR;
 
   Joystick stick;
   CANSparkMax leaderMotor;
@@ -80,22 +72,18 @@ public class Robot extends TimedRobot {
   Supplier<Double> rightEncoderRate;
   Supplier<Double> gyroAngleRadians;
 
-  NetworkTableEntry autoSpeedEntry = NetworkTableInstance.getDefault().getEntry(
-          IS_SYSID ? "/SmartDashboard/SysIdAutoSpeed" : "/robot/autospeed");
-  NetworkTableEntry telemetryEntry = NetworkTableInstance.getDefault().getEntry(
-          IS_SYSID ? "/SmartDashboard/SysIdTelemetry" : "/robot/telemetry");
-  NetworkTableEntry rotateEntry = NetworkTableInstance.getDefault().getEntry(
-          IS_SYSID ? "/SmartDashboard/SysIdRotate" : "/robot/rotate");
+  NetworkTableEntry autoSpeedEntry = NetworkTableInstance.getDefault().getEntry("/robot/autospeed");
+  NetworkTableEntry telemetryEntry = NetworkTableInstance.getDefault().getEntry("/robot/telemetry");
+  NetworkTableEntry rotateEntry = NetworkTableInstance.getDefault().getEntry("/robot/rotate");
 
   String data = "";
-
+  
   int counter = 0;
   double startTime = 0;
   double priorAutospeed = 0;
 
   double[] numberArray = new double[10];
   ArrayList<Double> entries = new ArrayList<Double>();
-
   public Robot() {
     super(.005);
     LiveWindow.disableAllTelemetry();
@@ -112,35 +100,37 @@ public class Robot extends TimedRobot {
     // create new motor and set neutral modes (if needed)
     // setup Brushless spark
     CANSparkMax motor = new CANSparkMax(port, MotorType.kBrushless);
-    motor.restoreFactoryDefaults();
-    motor.setIdleMode(IdleMode.kBrake);
+    motor.restoreFactoryDefaults(); 
+    motor.setIdleMode(IdleMode.kBrake);  
     motor.setInverted(inverted);
-
+    
     // setup encoder if motor isn't a follower
     if (side != Sides.FOLLOWER) {
+    
+      Encoder encoder;
 
 
-      CANEncoder encoder = motor.getEncoder();
+
+    switch (side) {
+      // setup encoder and data collecting methods
+
+      case LEFT:
+        encoder = new Encoder(9, 8);
+        encoder.setReverseDirection(false);
+        encoder.setDistancePerPulse(encoderConstant);
+        leftEncoderPosition = encoder::getDistance;
+        leftEncoderRate = encoder::getRate;
 
 
-      switch (side) {
-        // setup encoder and data collecting methods
-
-        case LEFT:
-          leftEncoderPosition = ()
-                  -> encoder.getPosition() * encoderConstant;
-          leftEncoderRate = ()
-                  -> encoder.getVelocity() * encoderConstant / 60.;
-
-          break;
-        default:
-          // probably do nothing
-          break;
+        break;
+      default:
+        // probably do nothing
+        break;
 
       }
-
+    
     }
-
+    
 
     return motor;
 
@@ -151,7 +141,7 @@ public class Robot extends TimedRobot {
     if (!isReal()) SmartDashboard.putData(new SimEnabler());
 
     stick = new Joystick(0);
-
+    
     // create left motor
     CANSparkMax leftMotor = setupCANSparkMax(41, Sides.LEFT, false);
 
@@ -219,13 +209,13 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * If you wish to just use your own robot program to use with the data logging
-   * program, you only need to copy/paste the logic below into your code and
-   * ensure it gets called periodically in autonomous mode
-   * <p>
-   * Additionally, you need to set NetworkTables update rate to 10ms using the
-   * setUpdateRate call.
-   */
+  * If you wish to just use your own robot program to use with the data logging
+  * program, you only need to copy/paste the logic below into your code and
+  * ensure it gets called periodically in autonomous mode
+  * 
+  * Additionally, you need to set NetworkTables update rate to 10ms using the
+  * setUpdateRate call.
+  */
   @Override
   public void autonomousPeriodic() {
 

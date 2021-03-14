@@ -1,5 +1,6 @@
 package io.excaliburfrc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +23,8 @@ public class Robot extends TimedRobot {
     LiveWindow.disableAllTelemetry();
     // Instantiate our RobotContainer. This will perform all our button bindings
     m_robotContainer = new RobotContainer();
+    addPeriodic(
+        () -> m_robotContainer.shooter.fastPeriodic(), m_robotContainer.shooter.kTimestep, 0.003);
   }
 
   @Override
@@ -52,13 +55,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    //    m_robotContainer.shooter._DebugSetVel(0);
     SmartDashboard.putNumber("ds", 0);
   }
 
   @Override
-  public void teleopPeriodic() {
-    //    if (m_robotContainer.shooter.getCurrentCommand() == null)
-    //    m_robotContainer.shooter._DebugSetVel(-DriverStation.getInstance().getStickAxis(1, 1));
+  public void testPeriodic() {
+    m_robotContainer.shooter.start(SmartDashboard.getNumber("ds", 0));
   }
 }

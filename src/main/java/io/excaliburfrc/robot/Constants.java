@@ -13,14 +13,12 @@ import edu.wpi.first.wpilibj.util.Units;
 public final class Constants {
   // add a inner class `public static final class` for each subsystem.
   public static final class IntakeConstants {
-
     public static final int INTAKE_MOTOR_ID = 60;
     public static final int FORWARD_CHANNEL = 1;
     public static final int REVERSE_CHANNEL = 0;
   }
 
   public static final class DriveConstants {
-
     public static final int RIGHT_LEADER_ID = 11;
     public static final int RIGHT_FOLLOWER_ID = 12;
     public static final int LEFT_LEADER_ID = 13;
@@ -37,46 +35,26 @@ public final class Constants {
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
   public static final class ShooterConstants {
-
     public static final int SHOOTER_ID = 41;
+    public static final int CHANNEL_A = 9;
+    public static final int CHANNEL_B = 8;
+
     public static final double TOLERANCE = 100; // TODO: tune
-    public static final double GEARING = 2.0;
-    public static final double SPEED_TO_RPM_CONVERSION =
-        2585 / 50.0; // In order to compare set point speed to encoder RPM, we need this conversion.
-    public static final double kS = 0.186, kV = 0.129, kA = 0.053;
-    public static final double kP = 0.0339;
-
-    public static final double SPEED_TOLERANCE = 200.0; // used to be 500 , 250
-
-    public static final double TOP_SPEED = 5300.0;
-    public static final double VOLTAGE_AT_TOP_SPEED = 11.7;
-    public static final double MOTOR_KV = VOLTAGE_AT_TOP_SPEED / TOP_SPEED;
-    public static final double SPEED_KP = 0.002; // CANNOT BE MORE THAN 0.002
-    public static final double SPEED_KI = 0.0;
-    public static final double SPEED_KD = 0.0;
-    public static final double SPEED_KFF = 0.11;
-
-    public static final double I_RANGE = 500;
-    public static final double kPEffectiveness = 0.135;
-    public static final double roughKPEffectiveness = 0.3;
-    public static final double fineErrorSize = 750;
-    public static final double kIEffectiveness = 0.12;
-
-    public static final int SPEED_BUCKET_SIZE = 20;
-
-    public static final double NOSP_SPEED_KP = 0.000175; // CANNOT BE MORE THAN 0.002
-    public static final double NOSP_SPEED_KI = 0.0;
+    public static final double ENCODER_CPR = 1024.0;
+    public static final double GEARING = 38.0 / 18.0;
+    public static final double TICKS_TO_WHEEL_ROTATIONS =
+        ENCODER_CPR / GEARING; // 485.05263157894734
+    public static final double kS = 0.28903, kV = 0.059347, kA = 0.00028977;
+    public static final double kP = 0.0027705;
   }
 
   public static final class TransporterConstants {
-
     public static final int FLICKER_ID = 33;
     public static final int LOADING_ID = 32;
     public static final int LIMIT = 100;
   }
 
   public static final class ClimberConstants {
-
     public static final int LEADER_ID = 51;
     public static final int FOLLOWER_ID = 50;
     public static final int HANGER_REV = 2;
