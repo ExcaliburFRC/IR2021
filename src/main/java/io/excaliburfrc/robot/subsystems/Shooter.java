@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
     shooterMotor.setIdleMode(IdleMode.kCoast);
 
     encoder = new Encoder(CHANNEL_A, CHANNEL_B);
-    encoder.setDistancePerPulse(1/TICKS_TO_WHEEL_ROTATIONS);
+    encoder.setDistancePerPulse(1 / TICKS_TO_WHEEL_ROTATIONS);
 
     controller = new PIDController(kP, 0.0, 0.0, kTimestep);
     ff = new SimpleMotorFeedforward(kS, kV, kA);
@@ -106,7 +106,7 @@ public class Shooter extends SubsystemBase {
     // update last position for vel calculation
     previousPosition = encoder.getDistance();
 
-    SmartDashboard.putNumber("shooterPos", encoder.getDistance());
+    //    SmartDashboard.putNumber("shooterPos", encoder.getDistance());
     SmartDashboard.putNumber("shooterVel", getVelocity());
     SmartDashboard.putBoolean("isReady", isAtTargetVelocity());
   }
@@ -122,10 +122,6 @@ public class Shooter extends SubsystemBase {
     return Math.abs(getVelocity() - target) < TOLERANCE;
   }
 
-  public void _DebugSetVel(double v) {
-    shooterMotor.set(v);
-  }
-
   public enum ShooterSpeed {
     HIGH(6000),
     LOW(2000);
@@ -137,6 +133,5 @@ public class Shooter extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }

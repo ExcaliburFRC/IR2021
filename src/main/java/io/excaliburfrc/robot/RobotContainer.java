@@ -92,7 +92,9 @@ public class RobotContainer {
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
             new StartEndCommand(
-                () -> shooter.start(Shooter.ShooterSpeed.HIGH), () -> shooter.stop(), shooter));
+                () -> shooter.start(SmartDashboard.getNumber("target_rps", 0)),
+                () -> shooter.stop(),
+                shooter));
 
     new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
     new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
@@ -134,7 +136,7 @@ public class RobotContainer {
     intake.raise();
     intake.activate(Intake.Mode.OFF);
     drivetrain.resetPose();
-    vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD);
+    vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.FORWARD);
   }
 
   public Command getAuto() {
