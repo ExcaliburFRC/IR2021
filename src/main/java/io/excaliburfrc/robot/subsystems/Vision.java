@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.robot.Constants;
 import org.photonvision.LEDMode;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPipelineResult;
 import org.photonvision.PhotonUtils;
 
 public class Vision extends SubsystemBase {
@@ -95,7 +94,7 @@ public class Vision extends SubsystemBase {
   }
 
   public double getDistance() {
-    if (currentMode == Mode.DRIVER) return 0;
+    if (currentMode == Mode.DRIVER) return -1;
     return PhotonUtils.calculateDistanceToTargetMeters(
         currentPosition.height,
         currentMode.targetHeight,
@@ -108,10 +107,10 @@ public class Vision extends SubsystemBase {
     return limelight.getLatestResult().getBestTarget().getYaw();
   }
 
- double lastDist = -1;
+  double lastDist = -1;
+
   @Override
   public void periodic() {
-
     SmartDashboard.putNumber("dist", lastDist);
     if (limelight.hasTargets()) lastDist = getDistance();
   }

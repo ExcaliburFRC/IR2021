@@ -1,11 +1,11 @@
 {
-  "cpr": <gearing- ticks(4096 cpr of mag enc) per wheel rotation>,
+  "cpr": 485.05263157894734,
   "encoder type": "roboRIO",
   "gyro": "",
   "gyro ctor": "",
   "motor controllers": ["SPARK MAX (Brushless)"],
   "primary encoder inverted": false,
-  "primary encoder ports": [0, 1],
+  "primary encoder ports": [9, 8],
   "primary motor ports": [41],
   "primary motors inverted": [false],
   "secondary encoder inverted": false,

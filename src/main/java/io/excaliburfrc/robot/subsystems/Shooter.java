@@ -3,46 +3,45 @@ package io.excaliburfrc.robot.subsystems;
 import static io.excaliburfrc.robot.Constants.ShooterConstants.*;
 
 import com.revrobotics.*;
-import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import io.excaliburfrc.lib.CANEncoderSim;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import io.excaliburfrc.lib.SimSparkMax;
 import io.excaliburfrc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
   private final CANSparkMax shooterMotor;
-  private final CANEncoder encoder;
-  private final CANPIDController controller;
+  private final Encoder encoder;
+  private final PIDController controller;
   private final SimpleMotorFeedforward ff;
-  private ShooterSpeed target = null;
+  public final double kTimestep = 0.005;
+
+  private double target = 0.0;
+  private double previousPosition = 0.0;
 
   private FlywheelSim flywheel;
-  private CANEncoderSim simEncoder;
+  private EncoderSim simEncoder;
 
   public Shooter() {
     shooterMotor = new SimSparkMax(SHOOTER_ID, MotorType.kBrushless);
     shooterMotor.restoreFactoryDefaults();
     shooterMotor.setIdleMode(IdleMode.kCoast);
 
-    encoder = shooterMotor.getEncoder();
-    encoder.setPositionConversionFactor(GEARING);
-    encoder.setVelocityConversionFactor(GEARING);
+    encoder = new Encoder(CHANNEL_A, CHANNEL_B);
+    encoder.setDistancePerPulse(1/TICKS_TO_WHEEL_ROTATIONS);
 
-    controller = shooterMotor.getPIDController();
-    controller.setFeedbackDevice(encoder);
-    controller.setP(kP);
-    controller.setI(0.0);
-    controller.setD(0.0);
-    controller.setFF(0.0);
+    controller = new PIDController(kP, 0.0, 0.0, kTimestep);
     ff = new SimpleMotorFeedforward(kS, kV, kA);
 
     if (RobotBase.isSimulation()) {
@@ -50,11 +49,9 @@ public class Shooter extends SubsystemBase {
           new FlywheelSim(
               LinearSystemId.identifyVelocitySystem(ShooterConstants.kV, ShooterConstants.kA),
               DCMotor.getNEO(1),
-              ShooterConstants.GEARING);
-      simEncoder = new CANEncoderSim(false, ShooterConstants.SHOOTER_ID);
+              ShooterConstants.TICKS_TO_WHEEL_ROTATIONS);
+      simEncoder = new EncoderSim(encoder);
     }
-    //    controller.setFeedbackDevice(encoder);
-
   }
 
   @Override
@@ -63,27 +60,70 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("vin", vin);
     flywheel.setInputVoltage(vin);
     flywheel.update(0.02);
-    simEncoder.setVelocity(flywheel.getAngularVelocityRPM());
+    simEncoder.setRate(flywheel.getAngularVelocityRPM());
+  }
+
+  public void startToVisionDistance(double visionDist) {
+    if (visionDist == -1) {
+      DriverStation.reportWarning("Trying to accelerate shooter to invalid vision distance", false);
+      return;
+    }
+    // replace with regression function
+    var suggestedTarget = visionDist;
+
+    target = suggestedTarget;
+  }
+
+  public void start(double speed) {
+    if (speed < 0) throw new IllegalArgumentException("shooter target velocity can't be negative");
+    target = speed;
   }
 
   public void start(ShooterSpeed speed) {
-    target = speed;
-    setVelRef(speed.rpm);
-  }
-
-  private void setVelRef(double rpm) {
-    controller.setReference(rpm, ControlType.kVelocity, 0, ff.calculate(rpm), ArbFFUnits.kVoltage);
+    target = speed.rpm;
   }
 
   public void stop() {
     shooterMotor.stopMotor();
+    target = 0;
+  }
+
+  public void fastPeriodic() {
+    double output = 0.0;
+
+    if (target < 0)
+      throw new AssertionError(
+          "shooter target velocity should not be negative"); // TODO: remove for comp
+    if (DriverStation.getInstance().isEnabled() && target != 0) {
+      var pid = MathUtil.clamp(controller.calculate(getVelocity(), target), 0.0, 1.0);
+      var feedforward = ff.calculate(target);
+      output = pid + feedforward;
+    }
+    if (!DriverStation.getInstance().isEnabled()) target = 0;
+
+    shooterMotor.set(output);
+
+    // update last position for vel calculation
+    previousPosition = encoder.getDistance();
+
+    SmartDashboard.putNumber("shooterPos", encoder.getDistance());
+    SmartDashboard.putNumber("shooterVel", getVelocity());
+    SmartDashboard.putBoolean("isReady", isAtTargetVelocity());
+  }
+
+  /** RPS: rounds per seconds */
+  public double getVelocity() {
+    // difference in position over time
+    // dx/dt
+    return (encoder.getDistance() - previousPosition) / kTimestep;
   }
 
   public boolean isAtTargetVelocity() {
-    if (target == null) {
-      return false;
-    }
-    return Math.abs(encoder.getVelocity() - target.rpm) < TOLERANCE;
+    return Math.abs(getVelocity() - target) < TOLERANCE;
+  }
+
+  public void _DebugSetVel(double v) {
+    shooterMotor.set(v);
   }
 
   public enum ShooterSpeed {
@@ -98,7 +138,5 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("shooterVel", encoder.getVelocity());
-    SmartDashboard.putBoolean("isReady", isAtTargetVelocity());
   }
 }

@@ -32,13 +32,13 @@ Robot::Robot() : frc::TimedRobot(5_ms) {
   wpi::SmallString<128> path;
   wpi::raw_svector_ostream os{path};
 
-  if constexpr (RobotBase::IsSimulation()) {
-    os << PROJECT_ROOT_DIR << "/src/main/deploy/config.json";
-
-  } else {
+//  if constexpr (RobotBase::IsSimulation()) {
+//    os << PROJECT_ROOT_DIR << "/src/main/deploy/config.json";
+//
+//  } else {
     frc::filesystem::GetDeployDirectory(path);
     os << "/config.json";
-  }
+//  }
 
   wpi::raw_fd_istream is{path.c_str(), ec};
 
