@@ -30,7 +30,9 @@ public final class Constants {
     public static final double PULSE_TO_METER = GEARING * WHEEL_RADIUS * Math.PI;
     //        1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
     public static final double kP = 0.0398;
-    public static final double kS = 0.129, kS_ang = 0.285; // TODO: tune
+    public static final double kS = 0.129, kS_ang = 0.285;
+    public static final double kP_ang = 0.025; // TODO: tune a bit more
+    public static final double ANGLE_TOLERANCE = 3;
   }
   // constants should be declared as `public static final double`
   // constant names should be in `SCREAMING_SNAKE_CASE` or `kUpperCamelCase`
@@ -39,11 +41,11 @@ public final class Constants {
     public static final int CHANNEL_A = 9;
     public static final int CHANNEL_B = 8;
 
-    public static final double TOLERANCE = 100; // TODO: tune
+    public static final double TOLERANCE = 1; // TODO: tune
     public static final double ENCODER_CPR = 1024.0;
     public static final double GEARING = 38.0 / 18.0;
     public static final double TICKS_TO_WHEEL_ROTATIONS =
-        ENCODER_CPR / GEARING; // 485.05263157894734
+        ENCODER_CPR / GEARING; // 485.05263157894734)
     public static final double kS = 0.28903, kV = 0.059347, kA = 0.00028977;
     public static final double kP = 0.0027705;
   }

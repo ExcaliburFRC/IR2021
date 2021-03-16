@@ -4,7 +4,6 @@ import static io.excaliburfrc.robot.Constants.DriveConstants.*;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.*;
-import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.lib.*;
+import java.util.function.DoubleSupplier;
 
 public class Drivetrain extends SubsystemBase {
   private final CANSparkMax rightLeader;
@@ -45,6 +45,7 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrivetrainSim simDrive;
   private final Field2d field;
   private final SimpleMotorFeedforward velFF = new SimpleMotorFeedforward(kS, kV_lin, kA_lin);
+  private PIDController angleController;
 
   public Drivetrain() {
     rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -86,7 +87,7 @@ public class Drivetrain extends SubsystemBase {
     gyro = new AHRS(SPI.Port.kMXP);
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
-    drive.setRightSideInverted(true);
+    drive.setRightSideInverted(false);
     drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
@@ -107,6 +108,9 @@ public class Drivetrain extends SubsystemBase {
               WHEEL_RADIUS,
               null);
     }
+
+    angleController = new PIDController(kP_ang, 0, 0);
+    angleController.setTolerance(ANGLE_TOLERANCE);
   }
 
   @Override
@@ -198,16 +202,17 @@ public class Drivetrain extends SubsystemBase {
     resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
   }
 
-  public void setVelocityRefs(double left, double right) {
-    leftController.setReference(
-        left, ControlType.kVelocity, 0, velFF.calculate(left), ArbFFUnits.kVoltage);
-    rightController.setReference(
-        right, ControlType.kVelocity, 0, velFF.calculate(right), ArbFFUnits.kVoltage);
-    SmartDashboard.putNumberArray("vel-setpoints", new double[] {left, right});
-  }
-
   public void stop() {
     leftLeader.stopMotor();
     rightLeader.stopMotor();
+  }
+
+  public Command goToAngle(DoubleSupplier angleMeasurement, double setpoint) {
+    return new PIDCommand(
+        angleController, angleMeasurement, setpoint, pow -> arcade(0, -pow), this);
+  }
+
+  public boolean isAtTargetAngle() {
+    return angleController.atSetpoint();
   }
 }
