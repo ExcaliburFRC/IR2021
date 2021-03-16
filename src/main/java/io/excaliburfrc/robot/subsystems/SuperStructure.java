@@ -1,5 +1,6 @@
 package io.excaliburfrc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.BooleanSupplier;
 
@@ -45,7 +46,9 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void execute() {
-      if (trigger.getAsBoolean() && isDriveLocked.getAsBoolean() && shooter.isAtTargetVelocity()) {
+      final boolean isDriveLockedAsBoolean = isDriveLocked.getAsBoolean();
+      SmartDashboard.putBoolean("isDriveAligned", isDriveLockedAsBoolean);
+      if (trigger.getAsBoolean() && isDriveLockedAsBoolean && shooter.isAtTargetVelocity()) {
         transporter.activate(Transporter.Mode.SHOOT);
       } else transporter.stop();
     }
