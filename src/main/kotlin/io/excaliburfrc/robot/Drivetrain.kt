@@ -28,7 +28,7 @@ object Drivetrain : SubsystemBase() {
 
   private val drive = DifferentialDrive(leftLeader, rightLeader)
   init {
-    drive.isRightSideInverted = true
+    drive.isRightSideInverted = false
   }
 
   fun arcadeDrive(xSpeed: () -> Double, zRotate: () -> Double) =
@@ -42,7 +42,7 @@ object Drivetrain : SubsystemBase() {
     LEDs.mode =
         when {
           DriverStation.getInstance().isDisabled -> YELLOW
-          defaultCommand.isScheduled -> OFF
+          defaultCommand?.isScheduled ?: false -> OFF
           v espilonEquals 0.0 -> BLUE
           v < 0.0 -> RED
           v > 0.0 -> GREEN

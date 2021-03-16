@@ -15,11 +15,11 @@ fun main() {
   RobotBase.startRobot { Robot }
 }
 
-const val leftX = -1
+const val leftX = 0
 
-const val leftY = 2
+const val leftY = 1
 
-const val rightX = 1
+const val rightX = 2
 
 const val rightY = 5
 
@@ -34,13 +34,13 @@ object Robot : TimedRobot() {
     with(SendableChooser<Command>()) {
       setDefaultOption(
           "Arcade Drive",
-          Drivetrain.arcadeDrive({ joystick.getRawAxis(leftY) }, { -joystick.getRawAxis(rightX) }))
+          Drivetrain.arcadeDrive({ -joystick.getRawAxis(leftY) }, { joystick.getRawAxis(rightX) }))
       addOption(
           "Tank Drive",
-          Drivetrain.tankDrive({ joystick.getRawAxis(leftY) }, { joystick.getRawAxis(rightY) }))
+          Drivetrain.tankDrive({ -joystick.getRawAxis(leftY) }, { -joystick.getRawAxis(rightY) }))
       addOption(
           "Left Arcade Drive",
-          Drivetrain.arcadeDrive({ joystick.getRawAxis(rightY) }, { -joystick.getRawAxis(leftX) }))
+          Drivetrain.arcadeDrive({ -joystick.getRawAxis(rightY) }, { joystick.getRawAxis(leftX) }))
 
       // anything else?
       // - trigger drive?
