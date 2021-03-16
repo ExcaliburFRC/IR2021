@@ -20,6 +20,7 @@ public class Vision extends SubsystemBase {
   private CameraPosition currentPosition;
 
   private static final double POWER_CELL_HEIGHT = 0.1; // should maybe be zero
+  private static final double POWER_PORT_HEIGHT = 310.0; // should maybe be zero
   private static final int POWER_PORT_PIPELINE = 1;
   private static final int POWER_CELL_PIPELINE = 2;
 
@@ -65,7 +66,7 @@ public class Vision extends SubsystemBase {
     }
 
     Mode() {
-      this(0);
+      this(-1);
     }
   }
 
@@ -94,7 +95,7 @@ public class Vision extends SubsystemBase {
   }
 
   public double getDistance() {
-    if (currentMode == Mode.DRIVER) return -1;
+    if (currentMode == Mode.DRIVER || !limelight.getLatestResult().hasTargets()) return -1;
     return PhotonUtils.calculateDistanceToTargetMeters(
         currentPosition.height,
         currentMode.targetHeight,
@@ -102,8 +103,9 @@ public class Vision extends SubsystemBase {
         Units.degreesToRadians(limelight.getLatestResult().getBestTarget().getPitch()));
   }
 
-  public double getXOffset() {
-    if (hasTargets()) return 0;
+  /** degrees */
+  public double getYawOffset() {
+    if (!hasTargets()) return -1;
     return limelight.getLatestResult().getBestTarget().getYaw();
   }
 

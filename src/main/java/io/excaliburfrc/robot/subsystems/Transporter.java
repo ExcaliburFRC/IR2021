@@ -51,6 +51,10 @@ public class Transporter extends SubsystemBase {
     loading.set(ControlMode.PercentOutput, mode.loading);
   }
 
+  public void stop() {
+    activate(Mode.OFF);
+  }
+
   public boolean isBallReady() {
     return ballDetector.getProximity() > LIMIT;
   }

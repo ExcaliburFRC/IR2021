@@ -1,5 +1,10 @@
 package io.excaliburfrc.robot;
 
+import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.FORWARD;
+import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
+import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
+import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
+
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -18,12 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RobotContainer {
   // The robot's subsystems, as `public final`
-  public final Intake intake = new Intake();
-  public final Shooter shooter = new Shooter();
-  public final Transporter transporter = new Transporter();
   public final Drivetrain drivetrain = new Drivetrain();
+  public final SuperStructure superstructure = new SuperStructure();
+
   public final Climber climber = new Climber();
-  public final Vision vision = new Vision();
 
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
@@ -41,19 +44,17 @@ public class RobotContainer {
     initSubsystemStates();
   }
 
-  private static final int kArcadeDrive = 0;
-  private static final int kTankDrive = 1;
   private final AtomicInteger mode = new AtomicInteger(0);
 
   @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
     // create `JoystickButton`s binding between the buttons and commands.
-    // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`
+    // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`3
     // DO NOT CREATE MORE JOYSTICKS! or rename them
 
     // driverJoystick
-    final int forwardDriveAxis = 2;
-    final int rotateDriveAxis = 1;
+    final int forwardDriveAxis = 1;
+    final int rotateDriveAxis = 2;
 
     // armJoystick
     final int shootButton = 1;
@@ -70,31 +71,29 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(
         new RunCommand(
-            () -> {
-              if (mode.get() % 2 == 0)
+            () ->
                 drivetrain.arcade(
-                    driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis) * -1);
-              else
-                drivetrain.tankDrive(
-                    -driveJoystick.getRawAxis(rotateDriveAxis), driveJoystick.getRawAxis(5));
-            },
+                    -driveJoystick.getRawAxis(forwardDriveAxis),
+                    driveJoystick.getRawAxis(rotateDriveAxis)),
             drivetrain));
 
     new JoystickButton(driveJoystick, 10).whenPressed(mode::incrementAndGet);
 
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> intake.activate(Intake.Mode.IN), intake)
-        .whenReleased(() -> intake.stop(), intake);
+        .whenPressed(superstructure::intake, superstructure)
+        .whenReleased(superstructure::stop, superstructure);
+    new JoystickButton(armJoystick, ejectButton)
+        .whenPressed(() -> superstructure.eject(), superstructure)
+        .whenReleased(() -> superstructure.stop(), superstructure);
+
+    var intake = superstructure.intake;
     new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.lower(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
 
+    var shooter = superstructure.shooter;
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
-            new StartEndCommand(
-                () -> shooter.start(SmartDashboard.getNumber("target_rps", 0)),
-                () -> shooter.stop(),
-                shooter));
+            superstructure.shoot(() -> armJoystick.getRawButton(1), FORWARD, drivetrain));
 
     new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
     new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
@@ -107,36 +106,25 @@ public class RobotContainer {
         .whileHeld(() -> climber.down(), climber)
         .whenReleased(() -> climber.stopMotor(), climber);
 
-    // TODO: merge with intake
-    new JoystickButton(armJoystick, inButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.IN), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
-
-    new JoystickButton(armJoystick, ejectButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.OUT), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
-
-    // TODO: merge with shooter
-    new JoystickButton(armJoystick, shootButton)
-        .whenPressed(() -> transporter.activate(Transporter.Mode.SHOOT), transporter)
-        .whenReleased(() -> transporter.activate(Transporter.Mode.OFF), transporter);
-
     new JoystickButton(armJoystick, compressorToggle)
         .toggleWhenPressed(
             new StartEndCommand(
                 () -> compressor.setClosedLoopControl(false),
                 () -> compressor.setClosedLoopControl(true)));
 
-    new JoystickButton(driveJoystick, 3)
+    var vision = superstructure.vision;
+    new JoystickButton(driveJoystick, 5)
         .toggleWhenPressed(
-            new InstantCommand(() -> vision.goTo(Vision.Mode.BALL, Vision.CameraPosition.FORWARD)));
+            new StartEndCommand(() -> vision.goTo(TARGET, UP), () -> vision.goTo(DRIVER, FORWARD)));
+    new JoystickButton(driveJoystick, 6)
+        .toggleWhenPressed(
+            new StartEndCommand(
+                () -> vision.goTo(TARGET, FORWARD), () -> vision.goTo(DRIVER, FORWARD)));
   }
 
   public void initSubsystemStates() {
-    intake.raise();
-    intake.activate(Intake.Mode.OFF);
+    superstructure.init();
     drivetrain.resetPose();
-    vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.FORWARD);
   }
 
   public Command getAuto() {
