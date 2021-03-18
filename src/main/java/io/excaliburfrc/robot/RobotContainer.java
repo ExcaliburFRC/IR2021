@@ -113,13 +113,13 @@ public class RobotContainer {
                 () -> compressor.setClosedLoopControl(true)));
 
     var vision = superstructure.vision;
+    vision.setDefaultCommand(
+        new StartEndCommand(() -> vision.goTo(DRIVER, FORWARD), () -> {}, vision));
     new JoystickButton(driveJoystick, 5)
-        .toggleWhenPressed(
-            new StartEndCommand(() -> vision.goTo(TARGET, UP), () -> vision.goTo(DRIVER, FORWARD)));
+        .toggleWhenPressed(new StartEndCommand(() -> vision.goTo(TARGET, UP), () -> {}, vision));
     new JoystickButton(driveJoystick, 6)
         .toggleWhenPressed(
-            new StartEndCommand(
-                () -> vision.goTo(TARGET, FORWARD), () -> vision.goTo(DRIVER, FORWARD)));
+            new StartEndCommand(() -> vision.goTo(TARGET, FORWARD), () -> {}, vision));
   }
 
   public void initSubsystemStates() {
