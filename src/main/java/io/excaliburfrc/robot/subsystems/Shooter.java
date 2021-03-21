@@ -67,8 +67,7 @@ public class Shooter extends SubsystemBase {
       return;
     }
     // replace with regression function
-    var suggestedTarget = 0.809 * visionDist - 1.69;
-
+    var suggestedTarget = 52.3 + 0.319 * visionDist + 0.614 * visionDist * visionDist;
     target = suggestedTarget;
   }
 
@@ -92,7 +91,7 @@ public class Shooter extends SubsystemBase {
     if (!DriverStation.getInstance().isEnabled()) target = 0;
     if (Double.compare(target, 0.0) != 0) {
       var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);
-      var feedforward = ff.calculate(target);
+      var feedforward = kF * (target);
       output = pid + feedforward;
     }
 
@@ -116,6 +115,6 @@ public class Shooter extends SubsystemBase {
   public boolean isAtTargetVelocity() {
     if (Double.compare(target, 0) == 0) return false;
     return true; // TODO: i have no flippin idea
-//    return Math.abs(velocity - target) < TOLERANCE;
+    //    return Math.abs(velocity - target) < TOLERANCE;
   }
 }

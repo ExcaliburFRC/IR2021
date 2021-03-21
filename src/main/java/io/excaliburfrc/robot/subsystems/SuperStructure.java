@@ -13,7 +13,7 @@ public class SuperStructure extends SubsystemBase {
   public void init() {
     intake.raise();
     intake.activate(Intake.Mode.OFF);
-    vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.FORWARD);
+    vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD);
   }
 
   public void intake() {
@@ -35,6 +35,7 @@ public class SuperStructure extends SubsystemBase {
     private final BooleanSupplier isDriveLocked;
 
     public ShootCommand(BooleanSupplier trigger, BooleanSupplier isDriveLocked) {
+      addRequirements(shooter);
       this.trigger = trigger;
       this.isDriveLocked = isDriveLocked;
     }
@@ -66,13 +67,13 @@ public class SuperStructure extends SubsystemBase {
     - startup shooter
   3. input balls to shooter from transporter by trigger
    */
-  public Command shoot(BooleanSupplier trigger, Vision.CameraPosition position, Drivetrain drive) {
+  public Command shoot(BooleanSupplier trigger, Drivetrain drive) {
     Command dtpid = drive.goToAngle(vision::getYawOffset, 0);
     Command visionControl =
         new StartEndCommand(
-            () -> vision.goTo(Vision.Mode.TARGET, position),
+            () -> vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.UP),
             () -> vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD),
-            shooter);
+            vision);
     Command shooterpid = new ShootCommand(trigger, drive::isAtTargetAngle);
 
     return new ParallelCommandGroup(dtpid, visionControl, shooterpid);

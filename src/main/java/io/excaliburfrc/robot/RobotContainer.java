@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import io.excaliburfrc.robot.commands.autonav.Slalum;
 import io.excaliburfrc.robot.subsystems.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,10 +91,9 @@ public class RobotContainer {
     new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.lower(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
 
-    var shooter = superstructure.shooter;
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
-            superstructure.shoot(() -> armJoystick.getRawButton(1), FORWARD, drivetrain));
+            superstructure.shoot(() -> armJoystick.getRawButton(shootButton), drivetrain));
 
     new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
     new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
@@ -111,15 +111,12 @@ public class RobotContainer {
             new StartEndCommand(
                 () -> compressor.setClosedLoopControl(false),
                 () -> compressor.setClosedLoopControl(true)));
+    CommandScheduler.getInstance().addButton(()->SmartDashboard.putBoolean("compressor", compressor.enabled()));
 
     var vision = superstructure.vision;
-    vision.setDefaultCommand(
-        new StartEndCommand(() -> vision.goTo(DRIVER, FORWARD), () -> {}, vision));
-    new JoystickButton(driveJoystick, 5)
-        .toggleWhenPressed(new StartEndCommand(() -> vision.goTo(TARGET, UP), () -> {}, vision));
-    new JoystickButton(driveJoystick, 6)
-        .toggleWhenPressed(
-            new StartEndCommand(() -> vision.goTo(TARGET, FORWARD), () -> {}, vision));
+    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(TARGET, FORWARD), vision);
+    new POVButton(armJoystick, 270).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
+    new POVButton(armJoystick, 180).whenPressed(() -> vision.goTo(TARGET, UP), vision);
   }
 
   public void initSubsystemStates() {
