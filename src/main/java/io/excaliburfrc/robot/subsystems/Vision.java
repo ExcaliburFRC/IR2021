@@ -3,12 +3,13 @@ package io.excaliburfrc.robot.subsystems;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.robot.Constants;
-import org.photonvision.LEDMode;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
@@ -18,11 +19,13 @@ public class Vision extends SubsystemBase {
 
   private Mode currentMode;
   private CameraPosition currentPosition;
+  private NetworkTableEntry leds = NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
 
   private static final double POWER_CELL_HEIGHT = 0.1; // should maybe be zero
   private static final double POWER_PORT_HEIGHT = 310.0; // should maybe be zero
   private static final int POWER_PORT_PIPELINE = 1;
   private static final int POWER_CELL_PIPELINE = 2;
+  private static final int DRIVER_PIPELINE = 3;
 
   public Vision() {
     limelight = new PhotonCamera("limelight");
@@ -41,7 +44,7 @@ public class Vision extends SubsystemBase {
 
   public enum CameraPosition {
     FORWARD(0.57, 0, kForward),
-    UP(1.2, 3.4, kReverse); // TODO: tune
+    UP(0.5, Units.degreesToRadians(40), kReverse); // TODO: tune
 
     private final double height;
     private final double pitch;
@@ -74,18 +77,19 @@ public class Vision extends SubsystemBase {
     currentMode = mode;
     switch (mode) {
       case BALL:
-        limelight.setLED(LEDMode.kOn);
         limelight.setDriverMode(false);
         limelight.setPipelineIndex(POWER_CELL_PIPELINE);
+        leds.setNumber(1);
         break;
       case DRIVER:
-        limelight.setLED(LEDMode.kOff);
+        limelight.setPipelineIndex(DRIVER_PIPELINE);
+        leds.setNumber(0);
         limelight.setDriverMode(true);
         break;
       case TARGET:
-        limelight.setLED(LEDMode.kOn);
         limelight.setDriverMode(false);
         limelight.setPipelineIndex(POWER_PORT_PIPELINE);
+        leds.setNumber(1);
         break;
     }
   }

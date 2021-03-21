@@ -31,7 +31,7 @@ public final class Constants {
     //        1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
     public static final double kP = 0.0398;
     public static final double kS = 0.129, kS_ang = 0.285;
-    public static final double kP_ang = 0.025; // TODO: tune a bit more
+    public static final double kP_ang = 0.04; // TODO: tune a bit more
     public static final double ANGLE_TOLERANCE = 3;
   }
   // constants should be declared as `public static final double`
@@ -48,6 +48,7 @@ public final class Constants {
         ENCODER_CPR / GEARING; // 485.05263157894734)
     public static final double kS = 0.28903, kV = 0.059347, kA = 0.00028977;
     public static final double kP = 0.0027705;
+    public static double kF = 1.0 / 170.0;
   }
 
   public static final class TransporterConstants {

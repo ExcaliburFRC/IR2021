@@ -45,7 +45,7 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrivetrainSim simDrive;
   private final Field2d field;
   private final SimpleMotorFeedforward velFF = new SimpleMotorFeedforward(kS, kV_lin, kA_lin);
-  private PIDController angleController;
+  private final PIDController angleController;
 
   public Drivetrain() {
     rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
