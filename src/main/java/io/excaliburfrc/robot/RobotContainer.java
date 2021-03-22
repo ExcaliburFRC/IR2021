@@ -111,7 +111,8 @@ public class RobotContainer {
             new StartEndCommand(
                 () -> compressor.setClosedLoopControl(false),
                 () -> compressor.setClosedLoopControl(true)));
-    CommandScheduler.getInstance().addButton(()->SmartDashboard.putBoolean("compressor", compressor.enabled()));
+    CommandScheduler.getInstance()
+        .addButton(() -> SmartDashboard.putBoolean("compressor", compressor.enabled()));
 
     var vision = superstructure.vision;
     new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(TARGET, FORWARD), vision);

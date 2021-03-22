@@ -19,7 +19,8 @@ public class Vision extends SubsystemBase {
 
   private Mode currentMode;
   private CameraPosition currentPosition;
-  private NetworkTableEntry leds = NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
+  private NetworkTableEntry leds =
+      NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
 
   private static final double POWER_CELL_HEIGHT = 0.1; // should maybe be zero
   private static final double POWER_PORT_HEIGHT = 310.0; // should maybe be zero

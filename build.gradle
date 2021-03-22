@@ -85,6 +85,7 @@ jar {
 
 spotless {
     lineEndings 'UNIX'
+    ratchetFrom 'origin/main'
     java {
         removeUnusedImports()
         trimTrailingWhitespace()
