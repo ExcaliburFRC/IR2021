@@ -114,7 +114,6 @@ public class Shooter extends SubsystemBase {
 
   public boolean isAtTargetVelocity() {
     if (Double.compare(target, 0) == 0) return false;
-    return true; // TODO: i have no flippin idea
-    //    return Math.abs(velocity - target) < TOLERANCE;
+    return Math.abs(velocity - target) < TOLERANCE;
   }
 }

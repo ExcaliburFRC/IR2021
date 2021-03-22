@@ -41,14 +41,16 @@ public final class Constants {
     public static final int CHANNEL_A = 9;
     public static final int CHANNEL_B = 8;
 
-    public static final double TOLERANCE = 1; // TODO: tune
+    /** Shooter PID tolerance */
+    public static final double TOLERANCE = 5; // fixme if too limiting
+
     public static final double ENCODER_CPR = 1024.0;
     public static final double GEARING = 38.0 / 18.0;
     public static final double TICKS_TO_WHEEL_ROTATIONS =
         ENCODER_CPR / GEARING; // 485.05263157894734)
     public static final double kS = 0.28903, kV = 0.059347, kA = 0.00028977;
     public static final double kP = 0.0027705;
-    public static double kF = 1.0 / 170.0;
+    public static final double kF = 1.0 / 170.0;
   }
 
   public static final class TransporterConstants {

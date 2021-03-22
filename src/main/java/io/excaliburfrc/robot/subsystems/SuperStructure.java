@@ -35,7 +35,7 @@ public class SuperStructure extends SubsystemBase {
     private final BooleanSupplier isDriveLocked;
 
     public ShootCommand(BooleanSupplier trigger, BooleanSupplier isDriveLocked) {
-      addRequirements(shooter);
+      addRequirements(shooter, transporter);
       this.trigger = trigger;
       this.isDriveLocked = isDriveLocked;
     }
@@ -79,11 +79,14 @@ public class SuperStructure extends SubsystemBase {
     return new ParallelCommandGroup(dtpid, visionControl, shooterpid);
   }
 
-  public void openIntake() {
-    intake.lower();
-  }
+  public Command dummyShoot(BooleanSupplier trigger) {
+    Command visionControl =
+        new StartEndCommand(
+            () -> vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.UP),
+            () -> vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD),
+            vision);
+    Command shooterpid = new ShootCommand(trigger, () -> true);
 
-  public void closeIntake() {
-    intake.raise();
+    return new ParallelCommandGroup(visionControl, shooterpid);
   }
 }
