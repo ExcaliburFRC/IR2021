@@ -38,13 +38,13 @@ class TransporterTest {
 
   @Test
   void verifyLimit() {
-    simProx.set(0.7 * TransporterConstants.LIMIT);
+    simProx.set(1.7 * TransporterConstants.LIMIT);
     assertTrue(transporter.isBallReady());
   }
 
   @Test
   void stopOnSensor() {
-    simProx.set(0.7 * TransporterConstants.LIMIT);
+    simProx.set(1.7 * TransporterConstants.LIMIT);
     assertTrue(transporter.isBallReady());
     transporter.activate(Mode.IN);
     TestUtil.stepCTRE();
@@ -56,7 +56,7 @@ class TransporterTest {
   @ParameterizedTest
   @EnumSource(Transporter.Mode.class)
   void setsValues(Transporter.Mode mode) {
-    simProx.set(1.3 * TransporterConstants.LIMIT);
+    simProx.set(0.3 * TransporterConstants.LIMIT);
     assertFalse(transporter.isBallReady());
     transporter.activate(mode);
     TestUtil.stepCTRE();
