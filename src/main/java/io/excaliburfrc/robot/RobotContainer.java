@@ -69,7 +69,7 @@ public class RobotContainer {
     final int startDummyShootButton = 9; // fixme - if you want something else
     final int climberOpenButton = 7;
     final int climberCloseButton = 8;
-    final int climberMotorAxis = 2; // fixme - Y on armJoystick
+    final int climberMotorAxis = 1; // fixme - Y on armJoystick
     final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(
