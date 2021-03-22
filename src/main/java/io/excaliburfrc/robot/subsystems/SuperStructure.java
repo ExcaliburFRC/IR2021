@@ -2,6 +2,7 @@ package io.excaliburfrc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.function.BooleanSupplier;
 
 public class SuperStructure extends SubsystemBase {
@@ -12,7 +13,7 @@ public class SuperStructure extends SubsystemBase {
 
   public void init() {
     intake.raise();
-    intake.activate(Intake.Mode.OFF);
+    stop();
     vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD);
   }
 
@@ -47,6 +48,7 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void execute() {
+      LEDs.INSTANCE.setMode(LedMode.RED);
       final boolean isDriveLockedAsBoolean = isDriveLocked.getAsBoolean();
       SmartDashboard.putBoolean("isDriveAligned", isDriveLockedAsBoolean);
       if (trigger.getAsBoolean() && isDriveLockedAsBoolean && shooter.isAtTargetVelocity()) {
@@ -76,7 +78,8 @@ public class SuperStructure extends SubsystemBase {
             vision);
     Command shooterpid = new ShootCommand(trigger, drive::isAtTargetAngle);
 
-    return new ParallelCommandGroup(dtpid, visionControl, shooterpid);
+    var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
+    return new ParallelCommandGroup(dtpid, visionControl, shooterpid, leds);
   }
 
   public Command dummyShoot(BooleanSupplier trigger) {

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import io.excaliburfrc.robot.Constants.ClimberConstants;
 import io.excaliburfrc.robot.subsystems.*;
+import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.List;
 
 /**
@@ -131,6 +132,7 @@ public class RobotContainer {
   public void initSubsystemStates() {
     superstructure.init();
     drivetrain.resetPose();
+    LEDs.INSTANCE.setMode(LedMode.BLUE);
   }
 
   public Command getAuto() {
