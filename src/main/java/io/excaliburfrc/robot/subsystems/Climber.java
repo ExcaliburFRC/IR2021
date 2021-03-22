@@ -5,7 +5,8 @@ import static io.excaliburfrc.robot.Constants.ClimberConstants.*;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
+import java.util.function.BooleanSupplier;
 
 public class Climber extends SubsystemBase {
   private final WPI_TalonSRX leader;
@@ -19,6 +20,19 @@ public class Climber extends SubsystemBase {
     leader.setInverted(true);
     follower.follow(leader);
     follower.setInverted(InvertType.OpposeMaster);
+  }
+
+  public Command ClimbMode(BooleanSupplier up, BooleanSupplier down) {
+    return new FunctionalCommand(
+        () -> {}, // init
+        () -> { // exe
+          if (up.getAsBoolean()) up();
+          else if (down.getAsBoolean()) down();
+          else stopMotor();
+        },
+        interrupted -> stopMotor(), // end
+        () -> false, // isFinished
+        this);
   }
 
   public void open() {

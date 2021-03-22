@@ -5,16 +5,19 @@ import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
 import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
 import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import io.excaliburfrc.robot.commands.autonav.Slalum;
+import io.excaliburfrc.robot.Constants.ClimberConstants;
 import io.excaliburfrc.robot.subsystems.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,15 +40,13 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    chooser.setDefaultOption("Nothing", new InstantCommand());
-    chooser.addOption("Slalum", new Slalum(drivetrain));
-    SmartDashboard.putData("Auto", chooser);
+    //    chooser.setDefaultOption("Nothing", new InstantCommand()); // for skills
+    //    chooser.addOption("Slalum", new Slalum(drivetrain));
+    //    SmartDashboard.putData("Auto", chooser); // for skills only
     // Configure the button bindings
     configureButtonBindings();
     initSubsystemStates();
   }
-
-  private final AtomicInteger mode = new AtomicInteger(0);
 
   @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
@@ -66,8 +67,7 @@ public class RobotContainer {
     final int startShootButton = 6;
     final int climberOpenButton = 7;
     final int climberCloseButton = 8;
-    final int climberUpButton = 9;
-    final int climberDownButton = 10;
+    final int climberMotorAxis = 2; // fixme - Y on armJoystick
     final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(
@@ -77,8 +77,6 @@ public class RobotContainer {
                     -driveJoystick.getRawAxis(forwardDriveAxis),
                     driveJoystick.getRawAxis(rotateDriveAxis)),
             drivetrain));
-
-    new JoystickButton(driveJoystick, 10).whenPressed(mode::incrementAndGet);
 
     new JoystickButton(armJoystick, inButton)
         .whenPressed(superstructure::intake, superstructure)
@@ -95,16 +93,24 @@ public class RobotContainer {
         .toggleWhenPressed(
             superstructure.shoot(() -> armJoystick.getRawButton(shootButton), drivetrain));
 
-    new JoystickButton(armJoystick, climberOpenButton).whenPressed(() -> climber.open(), climber);
-    new JoystickButton(armJoystick, climberCloseButton).whenPressed(() -> climber.close(), climber);
-
-    new JoystickButton(armJoystick, climberUpButton)
-        .whileHeld(() -> climber.up(), climber)
-        .whenReleased(() -> climber.stopMotor(), climber);
-
-    new JoystickButton(armJoystick, climberDownButton)
-        .whileHeld(() -> climber.down(), climber)
-        .whenReleased(() -> climber.stopMotor(), climber);
+    Command climbMode =
+        climber.ClimbMode(
+            () -> armJoystick.getRawAxis(climberMotorAxis) > ClimberConstants.DEADBAND,
+            () -> armJoystick.getRawAxis(climberMotorAxis) < -ClimberConstants.DEADBAND);
+    new JoystickButton(armJoystick, climberOpenButton)
+        .whenPressed(
+            () -> {
+              climber.open();
+              climbMode.schedule();
+            },
+            climber);
+    new JoystickButton(armJoystick, climberCloseButton)
+        .whenPressed(
+            () -> {
+              climber.close();
+              climbMode.cancel();
+            },
+            climber);
 
     new JoystickButton(armJoystick, compressorToggle)
         .toggleWhenPressed(
