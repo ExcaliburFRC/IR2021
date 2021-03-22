@@ -134,6 +134,16 @@ public class RobotContainer {
   }
 
   public Command getAuto() {
-    return chooser.getSelected();
+    // for competition
+    // go 1 meter forward, and then shoot
+    var traj =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(1, 0, Rotation2d.fromDegrees(0))),
+            new TrajectoryConfig(3, 3));
+    return new SelectCommand(() -> drivetrain.ramseteGroup(traj))
+        .andThen(superstructure.shoot(() -> true, drivetrain));
+
+    //    return chooser.getSelected(); // for skills
   }
 }
