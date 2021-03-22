@@ -29,8 +29,10 @@ public class Transporter extends SubsystemBase {
   }
 
   public enum Mode {
-    SHOOT(0.6, 0.5),
-    IN(0.6, 0.5),
+    // fixme - change values if needed
+    // (flickers, loading)
+    SHOOT(0.5, 0.5),
+    IN(0.5, 0.5),
     OUT(-0.4, -0.3),
     OFF(0, 0);
 

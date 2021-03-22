@@ -19,11 +19,9 @@ public class Vision extends SubsystemBase {
 
   private Mode currentMode;
   private CameraPosition currentPosition;
-  private NetworkTableEntry leds =
+  private final NetworkTableEntry leds =
       NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
 
-  private static final double POWER_CELL_HEIGHT = 0.1; // should maybe be zero
-  private static final double POWER_PORT_HEIGHT = 310.0; // should maybe be zero
   private static final int POWER_PORT_PIPELINE = 1;
   private static final int POWER_CELL_PIPELINE = 2;
   private static final int DRIVER_PIPELINE = 3;
@@ -110,7 +108,7 @@ public class Vision extends SubsystemBase {
 
   /** degrees */
   public double getYawOffset() {
-    if (!hasTargets()) return -1;
+    if (!limelight.hasTargets()) return -1;
     return limelight.getLatestResult().getBestTarget().getYaw();
   }
 

@@ -65,6 +65,7 @@ public class RobotContainer {
     final int openIntakeButton = 3;
     final int closeIntakeButton = 5;
     final int startShootButton = 6;
+    final int startDummyShootButton = 9; // fixme - if you want something else
     final int climberOpenButton = 7;
     final int climberCloseButton = 8;
     final int climberMotorAxis = 2; // fixme - Y on armJoystick
@@ -92,6 +93,8 @@ public class RobotContainer {
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
             superstructure.shoot(() -> armJoystick.getRawButton(shootButton), drivetrain));
+    new JoystickButton(armJoystick, startDummyShootButton)
+        .toggleWhenPressed(superstructure.dummyShoot(() -> armJoystick.getRawButton(shootButton)));
 
     Command climbMode =
         climber.ClimbMode(
@@ -121,8 +124,7 @@ public class RobotContainer {
         .addButton(() -> SmartDashboard.putBoolean("compressor", compressor.enabled()));
 
     var vision = superstructure.vision;
-    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(TARGET, FORWARD), vision);
-    new POVButton(armJoystick, 270).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
+    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
     new POVButton(armJoystick, 180).whenPressed(() -> vision.goTo(TARGET, UP), vision);
   }
 
