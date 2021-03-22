@@ -1,18 +1,14 @@
 package io.excaliburfrc.robot;
 
+import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
+import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
+
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import io.excaliburfrc.robot.subsystems.Transporter;
-
-import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.FORWARD;
-import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
-import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
-import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
 
 /**
  * This is a sample program to demonstrate the use of state-space classes in robot simulation. This
