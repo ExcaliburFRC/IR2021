@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import io.excaliburfrc.robot.subsystems.LEDs;
+import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import io.excaliburfrc.robot.subsystems.Transporter;
 
 /**
@@ -45,6 +47,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.initSubsystemStates();
+    LEDs.INSTANCE.setMode(LedMode.YELLOW);
     m_robotContainer.getAuto().schedule();
   }
 
@@ -55,6 +59,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
     m_robotContainer.initSubsystemStates();
     // init teleop
   }

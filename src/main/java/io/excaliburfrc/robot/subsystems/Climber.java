@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.*;
+import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.function.BooleanSupplier;
 
 public class Climber extends SubsystemBase {
@@ -26,6 +27,7 @@ public class Climber extends SubsystemBase {
     return new FunctionalCommand(
         () -> {}, // init
         () -> { // exe
+          LEDs.INSTANCE.setMode(LedMode.RAINBOW);
           if (up.getAsBoolean()) up();
           else if (down.getAsBoolean()) down();
           else stopMotor();
