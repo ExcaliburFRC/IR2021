@@ -131,12 +131,12 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("gyro", gyro.getAngle());
+    //    SmartDashboard.putNumber("gyro", gyro.getAngle());
     odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
-    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
-    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
+    //    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
+    //    SmartDashboard.putNumber("LeftEncoder", leftEncoder.getVelocity());
   }
 
   public void tankDrive(double left, double right) {
@@ -167,21 +167,13 @@ public class Drivetrain extends SubsystemBase {
         path,
         () -> odometry.getPoseMeters(),
         new RamseteController(),
-        new SimpleMotorFeedforward(kS, kV_lin, kA_lin),
+        velFF,
         new DifferentialDriveKinematics(TRACK_WIDTH),
-        () -> {
-          var whl =
-              new DifferentialDriveWheelSpeeds(
-                  leftEncoder.getVelocity(), rightEncoder.getVelocity());
-          SmartDashboard.putNumberArray(
-              "wheelspeeds", new double[] {whl.leftMetersPerSecond, whl.rightMetersPerSecond});
-          return whl;
-        },
+        () ->
+            new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()),
         new PIDController(kP, 0, 0),
         new PIDController(kP, 0, 0),
         (left, right) -> {
-          SmartDashboard.putNumber("left", left);
-          SmartDashboard.putNumber("right", right);
           leftLeader.setVoltage(left);
           rightLeader.setVoltage(right);
           drive.feed();
@@ -209,7 +201,11 @@ public class Drivetrain extends SubsystemBase {
 
   public Command goToAngle(DoubleSupplier angleMeasurement, double setpoint) {
     return new PIDCommand(
-        angleController, angleMeasurement, setpoint, pow -> arcade(0, -pow), this);
+        angleController,
+        angleMeasurement,
+        setpoint,
+        pow -> arcade(0, -pow + Math.copySign(kS_ang, -pow)),
+        this);
   }
 
   public boolean isAtTargetAngle() {

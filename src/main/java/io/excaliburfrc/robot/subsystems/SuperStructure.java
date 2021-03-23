@@ -34,9 +34,12 @@ public class SuperStructure extends SubsystemBase {
   public class ShootCommand extends CommandBase {
     private final BooleanSupplier trigger;
     private final BooleanSupplier isDriveLocked;
+    private final BooleanSupplier eject;
 
-    public ShootCommand(BooleanSupplier trigger, BooleanSupplier isDriveLocked) {
-      addRequirements(shooter, transporter);
+    public ShootCommand(
+        BooleanSupplier trigger, BooleanSupplier isDriveLocked, BooleanSupplier eject) {
+      addRequirements(shooter, transporter, vision);
+      this.eject = eject;
       this.trigger = trigger;
       this.isDriveLocked = isDriveLocked;
     }
@@ -53,6 +56,8 @@ public class SuperStructure extends SubsystemBase {
       SmartDashboard.putBoolean("isDriveAligned", isDriveLockedAsBoolean);
       if (trigger.getAsBoolean() && isDriveLockedAsBoolean && shooter.isAtTargetVelocity()) {
         transporter.activate(Transporter.Mode.SHOOT);
+      } else if (eject.getAsBoolean()) {
+        transporter.activate(Transporter.Mode.OUT);
       } else transporter.stop();
     }
 
@@ -69,27 +74,18 @@ public class SuperStructure extends SubsystemBase {
     - startup shooter
   3. input balls to shooter from transporter by trigger
    */
-  public Command shoot(BooleanSupplier trigger, Drivetrain drive) {
+  public Command shoot(BooleanSupplier trigger, BooleanSupplier eject, Drivetrain drive) {
     Command dtpid = drive.goToAngle(vision::getYawOffset, 0);
-    Command visionControl =
-        new StartEndCommand(
-            () -> vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.UP),
-            () -> vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD),
-            vision);
-    Command shooterpid = new ShootCommand(trigger, drive::isAtTargetAngle);
+    Command shooterpid = new ShootCommand(trigger, drive::isAtTargetAngle, eject);
 
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
-    return new ParallelCommandGroup(dtpid, visionControl, shooterpid, leds);
+    return new ParallelCommandGroup(dtpid, shooterpid, leds);
   }
 
-  public Command dummyShoot(BooleanSupplier trigger) {
-    Command visionControl =
-        new StartEndCommand(
-            () -> vision.goTo(Vision.Mode.TARGET, Vision.CameraPosition.UP),
-            () -> vision.goTo(Vision.Mode.DRIVER, Vision.CameraPosition.FORWARD),
-            vision);
-    Command shooterpid = new ShootCommand(trigger, () -> true);
+  public Command dummyShoot(BooleanSupplier trigger, BooleanSupplier eject) {
+    Command shooterpid = new ShootCommand(trigger, eject, () -> true);
 
-    return new ParallelCommandGroup(visionControl, shooterpid);
+    var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
+    return new ParallelCommandGroup(shooterpid, leds);
   }
 }

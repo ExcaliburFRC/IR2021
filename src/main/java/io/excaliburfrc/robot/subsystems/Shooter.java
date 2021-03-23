@@ -35,6 +35,7 @@ public class Shooter extends SubsystemBase {
     shooterMotor = new SimSparkMax(SHOOTER_ID, MotorType.kBrushless);
     shooterMotor.restoreFactoryDefaults();
     shooterMotor.setIdleMode(IdleMode.kCoast);
+    shooterMotor.enableVoltageCompensation(12);
 
     encoder = new Encoder(CHANNEL_A, CHANNEL_B);
     encoder.setDistancePerPulse(1 / TICKS_TO_WHEEL_ROTATIONS);
@@ -103,6 +104,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("shooterVel", velocity);
     SmartDashboard.putNumber("target", target);
     SmartDashboard.putBoolean("isAtTargetVelocity", isAtTargetVelocity());
+    SmartDashboard.putBoolean("isShooterActive", Double.compare(target, 0.0) != 0);
   }
 
   /** RPS: rounds per seconds */
