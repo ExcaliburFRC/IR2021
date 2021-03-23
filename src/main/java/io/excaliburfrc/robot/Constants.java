@@ -51,13 +51,13 @@ public final class Constants {
         ENCODER_CPR / GEARING; // 485.05263157894734)
     public static final double kS = 0.290, kV = 0.059347, kA = 0.00028977;
     public static final double kP = 0.0027705;
-    public static final double kF = 1.0 / 170.0;
+    public static final double kF = 1.0 / 175.0;
   }
 
   public static final class TransporterConstants {
     public static final int FLICKER_ID = 33;
     public static final int LOADING_ID = 32;
-    public static final int LIMIT = 100;
+    public static final int LIMIT = 250;
   }
 
   public static final class ClimberConstants {
