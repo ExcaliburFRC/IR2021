@@ -1,16 +1,10 @@
 package io.excaliburfrc.robot;
 
-import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
-import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.excaliburfrc.robot.subsystems.LEDs;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
-import io.excaliburfrc.robot.subsystems.Transporter;
 
 /**
  * This is a sample program to demonstrate the use of state-space classes in robot simulation. This
@@ -65,19 +59,15 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-    SmartDashboard.putNumber("target_rps", 0);
-    var vision = m_robotContainer.superstructure.vision;
-    vision.goTo(TARGET, UP);
-  }
+  public void testInit() {}
 
   @Override
-  public void testPeriodic() {
+  public void testPeriodic() {}
 
-    final Transporter transporter = m_robotContainer.superstructure.transporter;
-    if (DriverStation.getInstance().getStickButton(1, 1)) {
-      transporter.activate(Transporter.Mode.SHOOT);
-    } else transporter.stop();
-    m_robotContainer.superstructure.shooter.start(SmartDashboard.getNumber("target_rps", 0));
-  }
+  //    final Transporter transporter = m_robotContainer.superstructure.transporter;
+  //    if (DriverStation.getInstance().getStickButton(1, 1)) {
+  //      transporter.activate(Transporter.Mode.SHOOT);
+  //    } else transporter.stop();
+  //    m_robotContainer.superstructure.shooter.start(SmartDashboard.getNumber("target_rps", 0));
+  //  }
 }

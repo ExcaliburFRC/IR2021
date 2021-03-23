@@ -30,8 +30,9 @@ public final class Constants {
     public static final double PULSE_TO_METER = GEARING * WHEEL_RADIUS * Math.PI;
     //        1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
     public static final double kP = 0.0387;
-    public static final double kS = 0.129, kS_ang = 0.285;
-    public static final double kP_ang = 0.04; // TODO: tune a bit more
+    public static final double kS = 0.129;
+    public static final double kP_ang = 0.04,
+        kS_ang = 0.023749999999999997; // TODO: tune a bit more
     public static final double ANGLE_TOLERANCE = 3;
   }
   // constants should be declared as `public static final double`
@@ -42,13 +43,13 @@ public final class Constants {
     public static final int CHANNEL_B = 8;
 
     /** Shooter PID tolerance */
-    public static final double TOLERANCE = 7.5; // fixme if too limiting
+    public static final double TOLERANCE = 8; // fixme if too limiting
 
     public static final double ENCODER_CPR = 1024.0;
     public static final double GEARING = 38.0 / 18.0;
     public static final double TICKS_TO_WHEEL_ROTATIONS =
         ENCODER_CPR / GEARING; // 485.05263157894734)
-    public static final double kS = 0.28903, kV = 0.059347, kA = 0.00028977;
+    public static final double kS = 0.290, kV = 0.059347, kA = 0.00028977;
     public static final double kP = 0.0027705;
     public static final double kF = 1.0 / 170.0;
   }
@@ -64,11 +65,11 @@ public final class Constants {
     public static final int FOLLOWER_ID = 50;
     public static final int HANGER_REV = 2;
     public static final int HANGER_FWD = 3;
-    public static final double UP_SPEED = 0.6;
-    public static final double DOWN_SPEED = -0.4;
+    public static final double UP_SPEED = 0.8;
+    public static final double DOWN_SPEED = -0.6;
 
     /** Ignore values smaller than this */
-    public static final double DEADBAND = 0.5; // fixme
+    public static final double DEADBAND = 0.5;
   }
 
   public static final int LL_REV = 4;

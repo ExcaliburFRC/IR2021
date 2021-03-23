@@ -31,8 +31,8 @@ public class Transporter extends SubsystemBase {
   public enum Mode {
     // fixme - change values if needed
     // (flickers, loading)
-    SHOOT(0.5, 0.5),
-    IN(0.5, 0.5),
+    SHOOT(0.4, 0.4),
+    IN(0.3, 0.3),
     OUT(-0.4, -0.3),
     OFF(0, 0);
 
@@ -63,7 +63,8 @@ public class Transporter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("prox", ballDetector.getProximity());
+    if (isBallReady()) stop();
+    //    SmartDashboard.putNumber("prox", ballDetector.getProximity());
     SmartDashboard.putBoolean("isReady", isBallReady());
   }
 }

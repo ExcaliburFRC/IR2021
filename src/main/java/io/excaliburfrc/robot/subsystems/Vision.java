@@ -22,9 +22,9 @@ public class Vision extends SubsystemBase {
   private final NetworkTableEntry leds =
       NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
 
+  private static final int POWER_CELL_PIPELINE = 0;
   private static final int POWER_PORT_PIPELINE = 1;
-  private static final int POWER_CELL_PIPELINE = 2;
-  private static final int DRIVER_PIPELINE = 3;
+  private static final int DRIVER_PIPELINE = 2;
 
   public Vision() {
     limelight = new PhotonCamera("limelight");
@@ -98,12 +98,13 @@ public class Vision extends SubsystemBase {
   }
 
   public double getDistance() {
-    if (currentMode == Mode.DRIVER || !limelight.getLatestResult().hasTargets()) return -1;
+    var latest = limelight.getLatestResult();
+    if (currentMode == Mode.DRIVER || !latest.hasTargets()) return -1;
     return PhotonUtils.calculateDistanceToTargetMeters(
         currentPosition.height,
         currentMode.targetHeight,
         currentPosition.pitch,
-        Units.degreesToRadians(limelight.getLatestResult().getBestTarget().getPitch()));
+        Units.degreesToRadians(latest.getBestTarget().getPitch()));
   }
 
   /** degrees */

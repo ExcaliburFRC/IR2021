@@ -66,10 +66,10 @@ public class RobotContainer {
     final int openIntakeButton = 3;
     final int closeIntakeButton = 5;
     final int startShootButton = 6;
-    final int startDummyShootButton = 9; // fixme - if you want something else
-    final int climberOpenButton = 7;
-    final int climberCloseButton = 8;
-    final int climberMotorAxis = 1; // fixme - Y on armJoystick
+    final int startDummyShootButton = 9;
+    final int climberOpenButton = 8;
+    final int climberCloseButton = 7;
+    final int climberMotorAxis = 1;
     final int compressorToggle = 12;
 
     drivetrain.setDefaultCommand(
@@ -81,10 +81,10 @@ public class RobotContainer {
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
-        .whenPressed(superstructure::intake, superstructure)
+        .whileHeld(superstructure::intake, superstructure)
         .whenReleased(superstructure::stop, superstructure);
     new JoystickButton(armJoystick, ejectButton)
-        .whenPressed(() -> superstructure.eject(), superstructure)
+        .whileHeld(() -> superstructure.eject(), superstructure)
         .whenReleased(() -> superstructure.stop(), superstructure);
 
     var intake = superstructure.intake;
@@ -93,9 +93,15 @@ public class RobotContainer {
 
     new JoystickButton(armJoystick, startShootButton)
         .toggleWhenPressed(
-            superstructure.shoot(() -> armJoystick.getRawButton(shootButton), drivetrain));
+            superstructure.shoot(
+                () -> armJoystick.getRawButton(shootButton),
+                () -> armJoystick.getRawButton(ejectButton),
+                drivetrain));
     new JoystickButton(armJoystick, startDummyShootButton)
-        .toggleWhenPressed(superstructure.dummyShoot(() -> armJoystick.getRawButton(shootButton)));
+        .toggleWhenPressed(
+            superstructure.dummyShoot(
+                () -> armJoystick.getRawButton(shootButton),
+                () -> armJoystick.getRawButton(ejectButton)));
 
     Command climbMode =
         climber.ClimbMode(
@@ -133,6 +139,7 @@ public class RobotContainer {
     superstructure.init();
     drivetrain.resetPose();
     LEDs.INSTANCE.setMode(LedMode.BLUE);
+    climber.close();
   }
 
   public Command getAuto() {
@@ -141,10 +148,13 @@ public class RobotContainer {
     var traj =
         TrajectoryGenerator.generateTrajectory(
             List.of(
-                new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(1, 0, Rotation2d.fromDegrees(0))),
+                new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(0.6, 0, Rotation2d.fromDegrees(0))),
             new TrajectoryConfig(3, 3));
-    return new SelectCommand(() -> drivetrain.ramseteGroup(traj))
-        .andThen(superstructure.shoot(() -> true, drivetrain));
+    return (new SelectCommand(() -> drivetrain.ramseteGroup(traj))
+            .alongWith(
+                new InstantCommand(
+                    () -> superstructure.vision.goTo(TARGET, UP), superstructure.vision)))
+        .andThen(superstructure.shoot(() -> true, () -> false, drivetrain));
 
     //    return chooser.getSelected(); // for skills
   }
