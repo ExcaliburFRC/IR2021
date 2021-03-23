@@ -10,21 +10,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.robot.Constants;
+import java.util.ArrayList;
+import java.util.List;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
 public class Vision extends SubsystemBase {
   private final PhotonCamera limelight;
   private final DoubleSolenoid lifter;
+  private final List<Runnable> queuedActions = new ArrayList<>();
 
   private Mode currentMode;
   private CameraPosition currentPosition;
   private final NetworkTableEntry leds =
       NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode");
 
-  private static final int POWER_CELL_PIPELINE = 0;
-  private static final int POWER_PORT_PIPELINE = 1;
-  private static final int DRIVER_PIPELINE = 2;
+  private static final int POWER_PORT_PIPELINE = 0;
+  private static final int POWER_CELL_PIPELINE = 2;
 
   public Vision() {
     limelight = new PhotonCamera("limelight");
@@ -81,7 +83,6 @@ public class Vision extends SubsystemBase {
         leds.setNumber(1);
         break;
       case DRIVER:
-        limelight.setPipelineIndex(DRIVER_PIPELINE);
         leds.setNumber(0);
         limelight.setDriverMode(true);
         break;

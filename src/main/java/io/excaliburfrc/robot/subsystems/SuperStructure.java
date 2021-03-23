@@ -83,7 +83,7 @@ public class SuperStructure extends SubsystemBase {
   }
 
   public Command dummyShoot(BooleanSupplier trigger, BooleanSupplier eject) {
-    Command shooterpid = new ShootCommand(trigger, eject, () -> true);
+    Command shooterpid = new ShootCommand(trigger, () -> true, eject);
 
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
     return new ParallelCommandGroup(shooterpid, leds);
