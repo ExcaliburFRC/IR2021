@@ -65,8 +65,8 @@ public final class Constants {
     public static final int FOLLOWER_ID = 50;
     public static final int HANGER_REV = 2;
     public static final int HANGER_FWD = 3;
-    public static final double UP_SPEED = 0.8;
-    public static final double DOWN_SPEED = -0.6;
+    public static final double UP_SPEED = 0.95;
+    public static final double DOWN_SPEED = -0.8;
 
     /** Ignore values smaller than this */
     public static final double DEADBAND = 0.5;

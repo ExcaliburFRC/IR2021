@@ -107,6 +107,39 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "2,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_PipelineName",
+              "_title": "limelight_PipelineName"
+            }
+          },
+          "5,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Stream",
+              "_title": "limelight_Stream"
+            }
+          },
+          "6,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Interface",
+              "_title": "limelight_Interface"
+            }
           }
         }
       }
@@ -482,7 +515,7 @@
         "tiles": {
           "2,0": {
             "size": [
-              9,
+              8,
               5
             ],
             "content": {
@@ -491,7 +524,7 @@
               "_title": "limelight-output",
               "Crosshair/Show crosshair": true,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": true,
+              "Controls/Show controls": false,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
@@ -499,9 +532,9 @@
               "imageHeight": 0
             }
           },
-          "11,0": {
+          "12,0": {
             "size": [
-              2,
+              1,
               1
             ],
             "content": {
@@ -512,56 +545,67 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "0,4": {
+          "10,2": {
             "size": [
-              2,
-              2
+              1,
+              1
             ],
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/isReady",
-              "_title": "SmartDashboard/isReady",
+              "_title": "isReady",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "11,2": {
+          "12,1": {
             "size": [
-              2,
-              2
+              1,
+              1
             ],
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/isShooterActive",
-              "_title": "SmartDashboard/isShooterActive",
+              "_title": "isShooterActive",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "0,0": {
+          "10,0": {
             "size": [
-              2,
-              2
+              1,
+              1
             ],
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/isDriveAligned",
-              "_title": "/SmartDashboard/isDriveAligned",
+              "_title": "Merkav",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "0,2": {
+          "10,1": {
             "size": [
-              2,
-              2
+              1,
+              1
             ],
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/isAtTargetVelocity",
-              "_title": "SmartDashboard/isAtTargetVelocity",
+              "_title": "Speed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "12,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/dist",
+              "_title": "/SmartDashboard/dist"
             }
           }
         }
@@ -569,9 +613,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -7.199999809265137,
-    "y": -7.199999809265137,
-    "width": 1550.4000244140625,
-    "height": 838.4000244140625
+    "x": 0.0,
+    "y": 0.0,
+    "width": 1536.0,
+    "height": 824.0
   }
 }

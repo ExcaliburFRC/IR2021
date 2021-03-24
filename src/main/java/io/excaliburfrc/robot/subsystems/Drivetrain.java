@@ -60,10 +60,10 @@ public class Drivetrain extends SubsystemBase {
     rightLeader.setInverted(true);
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
-    leftLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    leftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    rightLeader.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    rightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leftLeader.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    leftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    rightLeader.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    rightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
