@@ -68,12 +68,16 @@ public class Shooter extends SubsystemBase {
       return;
     }
     // replace with regression function
-    var suggestedTarget = 52.3 + 0.319 * visionDist + 0.614 * visionDist * visionDist;
+    var suggestedTarget = 52.7 + 0.319 * visionDist + 0.614 * visionDist * visionDist;
     target = suggestedTarget;
   }
 
   public void start(double speed) {
-    if (speed < 0) throw new IllegalArgumentException("shooter target velocity can't be negative");
+    if (speed < 0) {
+      DriverStation.reportWarning("Trying to accelerate shooter to invalid vision distance", false);
+      return;
+    }
+
     target = speed;
   }
 

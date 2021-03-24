@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class SuperStructure extends SubsystemBase {
   public final Intake intake = new Intake();
@@ -35,10 +36,30 @@ public class SuperStructure extends SubsystemBase {
     private final BooleanSupplier trigger;
     private final BooleanSupplier isDriveLocked;
     private final BooleanSupplier eject;
+    private final DoubleSupplier distanceSource;
+    private final double target;
 
     public ShootCommand(
-        BooleanSupplier trigger, BooleanSupplier isDriveLocked, BooleanSupplier eject) {
+        BooleanSupplier trigger,
+        BooleanSupplier isDriveLocked,
+        BooleanSupplier eject,
+        DoubleSupplier distanceSource) {
+      this.distanceSource = distanceSource;
       addRequirements(shooter, transporter, vision);
+      this.eject = eject;
+      this.trigger = trigger;
+      this.isDriveLocked = isDriveLocked;
+      target = 0;
+    }
+
+    public ShootCommand(
+          BooleanSupplier trigger,
+          BooleanSupplier isDriveLocked,
+          BooleanSupplier eject,
+          double target) {
+      addRequirements(shooter, transporter, vision);
+      this.distanceSource = null;
+      this.target = target;
       this.eject = eject;
       this.trigger = trigger;
       this.isDriveLocked = isDriveLocked;
@@ -46,7 +67,11 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void initialize() {
-      shooter.startToVisionDistance(vision.getDistance());
+      if (distanceSource == null) {
+        shooter.start(target);
+      } else {
+        shooter.startToVisionDistance(distanceSource.getAsDouble());
+      }
     }
 
     @Override
@@ -76,14 +101,15 @@ public class SuperStructure extends SubsystemBase {
    */
   public Command shoot(BooleanSupplier trigger, BooleanSupplier eject, Drivetrain drive) {
     Command dtpid = drive.goToAngle(vision::getYawOffset, 0);
-    Command shooterpid = new ShootCommand(trigger, drive::isAtTargetAngle, eject);
+    Command shooterpid =
+        new ShootCommand(trigger, drive::isAtTargetAngle, eject, vision::getDistance);
 
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
     return new ParallelCommandGroup(dtpid, shooterpid, leds);
   }
 
   public Command dummyShoot(BooleanSupplier trigger, BooleanSupplier eject) {
-    Command shooterpid = new ShootCommand(trigger, () -> true, eject);
+    Command shooterpid = new ShootCommand(trigger, () -> true, eject, 80);
 
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
     return new ParallelCommandGroup(shooterpid, leds);
