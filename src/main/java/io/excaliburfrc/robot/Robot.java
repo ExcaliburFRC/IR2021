@@ -23,6 +23,7 @@ public class Robot extends TimedRobot {
     LiveWindow.disableAllTelemetry();
     // Instantiate our RobotContainer. This will perform all our button bindings
     m_robotContainer = new RobotContainer();
+    // register the 5ms shooter velocity PID loop
     addPeriodic(
         () -> m_robotContainer.superstructure.shooter.fastPeriodic(),
         m_robotContainer.superstructure.shooter.kTimestep,

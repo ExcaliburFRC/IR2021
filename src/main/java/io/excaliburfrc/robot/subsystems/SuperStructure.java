@@ -39,6 +39,7 @@ public class SuperStructure extends SubsystemBase {
     private final DoubleSupplier distanceSource;
     private final double target;
 
+    /** For distance-computed velocity spinup */
     public ShootCommand(
         BooleanSupplier trigger,
         BooleanSupplier isDriveLocked,
@@ -52,11 +53,12 @@ public class SuperStructure extends SubsystemBase {
       target = 0;
     }
 
+    /** For constant velocity spinup */
     public ShootCommand(
-          BooleanSupplier trigger,
-          BooleanSupplier isDriveLocked,
-          BooleanSupplier eject,
-          double target) {
+        BooleanSupplier trigger,
+        BooleanSupplier isDriveLocked,
+        BooleanSupplier eject,
+        double target) {
       addRequirements(shooter, transporter, vision);
       this.distanceSource = null;
       this.target = target;
@@ -67,6 +69,7 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void initialize() {
+      // determine whether we're going for a constant velocity or computed
       if (distanceSource == null) {
         shooter.start(target);
       } else {
@@ -100,17 +103,21 @@ public class SuperStructure extends SubsystemBase {
   3. input balls to shooter from transporter by trigger
    */
   public Command shoot(BooleanSupplier trigger, BooleanSupplier eject, Drivetrain drive) {
+    // constantly align drive
     Command dtpid = drive.goToAngle(vision::getYawOffset, 0);
+    // spinup based on distance, and check if drive is aligned
     Command shooterpid =
         new ShootCommand(trigger, drive::isAtTargetAngle, eject, vision::getDistance);
-
+    // the most important part - LEDs!
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
     return new ParallelCommandGroup(dtpid, shooterpid, leds);
   }
 
   public Command dummyShoot(BooleanSupplier trigger, BooleanSupplier eject) {
+    // make it seem as if drive is always aligned
+    // spinup to 80 rps
     Command shooterpid = new ShootCommand(trigger, () -> true, eject, 80);
-
+    // the most important part - LEDs!
     var leds = new InstantCommand(() -> LEDs.INSTANCE.setMode(LedMode.GREEN));
     return new ParallelCommandGroup(shooterpid, leds);
   }

@@ -31,8 +31,7 @@ public final class Constants {
     //        1 / 23.5; // (CPR * GEARING) / (WHEEL_RADIUS * Math.PI);
     public static final double kP = 0.0387;
     public static final double kS = 0.129;
-    public static final double kP_ang = 0.04,
-        kS_ang = 0.023749999999999997; // TODO: tune a bit more
+    public static final double kP_ang = 0.04, kS_ang = 0.023749999999999997;
     public static final double ANGLE_TOLERANCE = 3;
   }
   // constants should be declared as `public static final double`
@@ -43,7 +42,7 @@ public final class Constants {
     public static final int CHANNEL_B = 8;
 
     /** Shooter PID tolerance */
-    public static final double TOLERANCE = 8; // fixme if too limiting
+    public static final double TOLERANCE = 8;
 
     public static final double ENCODER_CPR = 1024.0;
     public static final double GEARING = 38.0 / 18.0;
