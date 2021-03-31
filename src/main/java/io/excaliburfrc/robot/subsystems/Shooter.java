@@ -90,8 +90,9 @@ public class Shooter extends SubsystemBase {
     double output = 0.0;
     velocity = getVelocity();
 
-    if (target < 0) // this never happened in comp - it's safe!
+    if (target < 0) { // this never happened in comp - it's safe!
       throw new AssertionError("shooter target velocity should not be negative");
+    }
     if (!DriverStation.getInstance().isEnabled()) target = 0;
     if (Double.compare(target, 0.0) != 0) {
       var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);

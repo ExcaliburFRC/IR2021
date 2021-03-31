@@ -86,6 +86,7 @@ jar {
 compileKotlin {
      kotlinOptions{
          jvmTarget = "1.8"
+         useIR = true
     }
 }
 
