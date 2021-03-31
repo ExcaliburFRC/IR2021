@@ -67,7 +67,7 @@ public class Shooter extends SubsystemBase {
       DriverStation.reportWarning("Trying to accelerate shooter to invalid vision distance", false);
       return;
     }
-    // replace with regression function
+    // regression function
     var suggestedTarget = 52.7 + 0.319 * visionDist + 0.614 * visionDist * visionDist;
     target = suggestedTarget;
   }
@@ -90,9 +90,8 @@ public class Shooter extends SubsystemBase {
     double output = 0.0;
     velocity = getVelocity();
 
-    if (target < 0)
-      throw new AssertionError(
-          "shooter target velocity should not be negative"); // TODO: remove for comp
+    if (target < 0) // this never happened in comp - it's safe!
+      throw new AssertionError("shooter target velocity should not be negative");
     if (!DriverStation.getInstance().isEnabled()) target = 0;
     if (Double.compare(target, 0.0) != 0) {
       var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);

@@ -45,7 +45,7 @@ public class Vision extends SubsystemBase {
 
   public enum CameraPosition {
     FORWARD(0.57, 0, kForward),
-    UP(0.5, Units.degreesToRadians(40), kReverse); // TODO: tune
+    UP(0.5, Units.degreesToRadians(40), kReverse);
 
     private final double height;
     private final double pitch;
@@ -118,6 +118,10 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    /*
+    To avoid NPEs when trying to fetch data on an unidentified target,
+    post distance only when we have targets
+     */
     SmartDashboard.putNumber("dist", lastDist);
     if (limelight.hasTargets()) lastDist = getDistance();
   }
