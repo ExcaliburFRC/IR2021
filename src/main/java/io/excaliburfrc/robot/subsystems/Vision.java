@@ -13,6 +13,7 @@ import io.excaliburfrc.robot.Constants;
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPipelineResult;
 import org.photonvision.PhotonUtils;
 
 public class Vision extends SubsystemBase {
@@ -47,8 +48,8 @@ public class Vision extends SubsystemBase {
     FORWARD(0.57, 0, kForward),
     UP(0.5, Units.degreesToRadians(40), kReverse);
 
-    private final double height;
-    private final double pitch;
+    public final double height;
+    public final double pitch;
     private final DoubleSolenoid.Value pistonState;
 
     CameraPosition(double height, double pitch, DoubleSolenoid.Value pistonState) {
@@ -124,5 +125,9 @@ public class Vision extends SubsystemBase {
      */
     SmartDashboard.putNumber("dist", lastDist);
     if (limelight.hasTargets()) lastDist = getDistance();
+  }
+
+  public PhotonPipelineResult result() {
+    return limelight.getLatestResult();
   }
 }
