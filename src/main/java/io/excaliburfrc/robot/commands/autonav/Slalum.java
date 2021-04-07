@@ -15,7 +15,7 @@ public class Slalum extends SequentialCommandGroup {
               Filesystem.getDeployDirectory()
                   .toPath()
                   .resolve("output")
-                  .resolve("slalum.wpilib.json"));
+                  .resolve("Slalum.wpilib.json"));
       addCommands(
           new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
           drive.ramsete(traj),

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import io.excaliburfrc.robot.Constants.ClimberConstants;
 import io.excaliburfrc.robot.commands.autonav.Slalum;
+import io.excaliburfrc.robot.commands.autonav.barrel;
 import io.excaliburfrc.robot.commands.galsearch.GalacticSearch;
 import io.excaliburfrc.robot.subsystems.*;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
@@ -46,6 +47,7 @@ public class RobotContainer {
   public RobotContainer() {
     chooser.setDefaultOption("Nothing", new InstantCommand()); // for skills
     chooser.addOption("Slalum", new Slalum(drivetrain));
+    chooser.addOption("barrel", new barrel(drivetrain));
     // for competition
     // go 1 meter forward, and then shoot
     var competition =
