@@ -61,6 +61,10 @@ public class Drivetrain extends SubsystemBase {
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
     setIdleMode(CANSparkMax.IdleMode.kCoast);
+    leftLeader.enableVoltageCompensation(12);
+    leftFollower.enableVoltageCompensation(12);
+    rightLeader.enableVoltageCompensation(12);
+    rightFollower.enableVoltageCompensation(12);
 
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
