@@ -73,7 +73,8 @@ public class RobotContainer {
   }
 
   public Command galacticSearch() {
-    var ramsete = new InstantCommand(); //new SelectCommand(()->drivetrain.ramseteGroup(GalacticSearch.getTrajectory(superstructure.vision)));
+    var ramsete = new InstantCommand(); // new
+    // SelectCommand(()->drivetrain.ramseteGroup(GalacticSearch.getTrajectory(superstructure.vision)));
     var in = new RunCommand(superstructure::intake, superstructure);
     return new ParallelDeadlineGroup(ramsete, in);
   }

@@ -11,14 +11,12 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
 import io.excaliburfrc.robot.subsystems.Vision;
-import org.photonvision.PhotonPipelineResult;
-import org.photonvision.PhotonUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.photonvision.PhotonPipelineResult;
+import org.photonvision.PhotonUtils;
 
 public class GalacticSearch {
   static final Pose2d origin = new Pose2d();
@@ -71,9 +69,8 @@ public class GalacticSearch {
       if (sel == null) return;
       field
           .getObject("x")
-          .setPoses(sel.getStates().stream()
-                  .map(state -> state.poseMeters)
-                  .collect(Collectors.toList()));
+          .setPoses(
+              sel.getStates().stream().map(state -> state.poseMeters).collect(Collectors.toList()));
     }
   }
 
@@ -96,7 +93,9 @@ public class GalacticSearch {
   }
 
   private static Path determinePath(PhotonPipelineResult result) {
-    var distance = PhotonUtils.calculateDistanceToTargetMeters(Vision.CameraPosition.FORWARD.height, 0.1, Vision.CameraPosition.FORWARD.pitch, 0);
+    var distance =
+        PhotonUtils.calculateDistanceToTargetMeters(
+            Vision.CameraPosition.FORWARD.height, 0.1, Vision.CameraPosition.FORWARD.pitch, 0);
     if (distance < Units.inchesToMeters(100)) {
       // we're doing red!
       if (result.getTargets().get(0).getYaw() > 5) {

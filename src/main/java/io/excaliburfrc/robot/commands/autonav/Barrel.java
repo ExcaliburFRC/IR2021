@@ -11,15 +11,15 @@ public class Barrel extends SequentialCommandGroup {
   public Barrel(Drivetrain drive) {
     try {
       Trajectory traj =
-            TrajectoryUtil.fromPathweaverJson(
-                  Filesystem.getDeployDirectory()
-                        .toPath()
-                        .resolve("output")
-                        .resolve("barrel.wpilib.json"));
+          TrajectoryUtil.fromPathweaverJson(
+              Filesystem.getDeployDirectory()
+                  .toPath()
+                  .resolve("output")
+                  .resolve("barrel.wpilib.json"));
       addCommands(
-            new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
-            drive.ramsete(traj),
-            new InstantCommand(() -> drive.stop(), drive));
+          new InstantCommand(() -> drive.resetPose(traj.getInitialPose()), drive),
+          drive.ramsete(traj),
+          new InstantCommand(() -> drive.stop(), drive));
     } catch (IOException e) {
       DriverStation.reportError(e.getMessage(), e.getStackTrace());
     }
