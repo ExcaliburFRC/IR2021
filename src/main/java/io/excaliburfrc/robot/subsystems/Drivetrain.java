@@ -60,10 +60,11 @@ public class Drivetrain extends SubsystemBase {
     rightLeader.setInverted(true);
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
-    leftLeader.setIdleMode(CANSparkMax.IdleMode.kCoast);
-    leftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
-    rightLeader.setIdleMode(CANSparkMax.IdleMode.kCoast);
-    rightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    setIdleMode(CANSparkMax.IdleMode.kCoast);
+    leftLeader.enableVoltageCompensation(12);
+    leftFollower.enableVoltageCompensation(12);
+    rightLeader.enableVoltageCompensation(12);
+    rightFollower.enableVoltageCompensation(12);
 
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
@@ -111,6 +112,13 @@ public class Drivetrain extends SubsystemBase {
 
     angleController = new PIDController(kP_ang, 0, 0);
     angleController.setTolerance(ANGLE_TOLERANCE);
+  }
+
+  public void setIdleMode(CANSparkMax.IdleMode idleMode) {
+    leftLeader.setIdleMode(idleMode);
+    leftFollower.setIdleMode(idleMode);
+    rightLeader.setIdleMode(idleMode);
+    rightFollower.setIdleMode(idleMode);
   }
 
   @Override

@@ -23,6 +23,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public enum Mode {
     IN(0.6),
+    AUTO(1),
     OUT(-0.4),
     OFF(0.0);
 

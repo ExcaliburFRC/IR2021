@@ -1,8 +1,11 @@
 package io.excaliburfrc.robot;
 
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import io.excaliburfrc.robot.commands.galsearch.GalacticSearch;
 import io.excaliburfrc.robot.subsystems.LEDs;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 
@@ -31,6 +34,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void simulationInit() {
+    new GalacticSearch.SimulationManager();
+  }
+
+  @Override
   public void simulationPeriodic() {
     // periodic robot-wide sim
   }
@@ -44,12 +52,23 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.initSubsystemStates();
     LEDs.INSTANCE.setMode(LedMode.YELLOW);
+    m_robotContainer.drivetrain.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_robotContainer.getAuto().schedule();
   }
 
+  double stopTime = 0;
+
   @Override
   public void disabledInit() {
+    stopTime = Timer.getFPGATimestamp();
     CommandScheduler.getInstance().cancelAll();
+  }
+
+  @Override
+  public void disabledPeriodic() {
+    if (Timer.getFPGATimestamp() - stopTime > 1.0) {
+      m_robotContainer.drivetrain.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
   }
 
   @Override
