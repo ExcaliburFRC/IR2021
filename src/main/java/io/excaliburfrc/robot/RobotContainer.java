@@ -1,5 +1,6 @@
 package io.excaliburfrc.robot;
 
+import static io.excaliburfrc.robot.ButtonBindingsKt.*;
 import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.FORWARD;
 import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
 import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
@@ -85,40 +86,11 @@ public class RobotContainer {
     // use the two joysticks that are already declared: `driveJoystick` and `armJoystick`3
     // DO NOT CREATE MORE JOYSTICKS! or rename them
 
-    // driverJoystick
-    final int forwardDriveAxis = 1;
-    final int rotateDriveAxis = 2;
-
     // armJoystick
-    final int shootButton = 1;
-    final int inButton = 2;
-    final int ejectButton = 4;
-    final int openIntakeButton = 3;
-    final int closeIntakeButton = 5;
-    final int startShootButton = 6;
-    final int startDummyShootButton = 9;
-    final int climberOpenButton = 8;
-    final int climberCloseButton = 7;
-    final int climberMotorAxis = 1;
-    final int compressorToggle = 12;
 
-    drivetrain.setDefaultCommand(
-        new RunCommand(
-            () ->
-                drivetrain.arcade(
-                    -driveJoystick.getRawAxis(forwardDriveAxis),
-                    driveJoystick.getRawAxis(rotateDriveAxis)),
-            drivetrain));
-
-    new JoystickButton(armJoystick, inButton)
-        .whileHeld(superstructure::intake, superstructure)
-        .whenReleased(superstructure::stop, superstructure);
-    new JoystickButton(armJoystick, ejectButton)
-        .whileHeld(() -> superstructure.eject(), superstructure)
-        .whenReleased(() -> superstructure.stop(), superstructure);
+    bind(driveJoystick, armJoystick, drivetrain, superstructure);
 
     var intake = superstructure.intake;
-    new JoystickButton(armJoystick, openIntakeButton).whenPressed(() -> intake.lower(), intake);
     new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
 
     new JoystickButton(armJoystick, startShootButton)
