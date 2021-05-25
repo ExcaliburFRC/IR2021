@@ -1,9 +1,7 @@
 package io.excaliburfrc.robot;
 
 import static io.excaliburfrc.robot.ButtonBindingsKt.*;
-import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.FORWARD;
 import static io.excaliburfrc.robot.subsystems.Vision.CameraPosition.UP;
-import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
 import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
 
 import com.revrobotics.CANSparkMax;
@@ -15,9 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import io.excaliburfrc.robot.Constants.ClimberConstants;
 import io.excaliburfrc.robot.commands.autonav.Barrel;
 import io.excaliburfrc.robot.commands.autonav.Bounce;
 import io.excaliburfrc.robot.commands.autonav.Slalum;
@@ -88,53 +83,7 @@ public class RobotContainer {
 
     // armJoystick
 
-    bind(driveJoystick, armJoystick, drivetrain, superstructure);
-
-    var intake = superstructure.intake;
-    new JoystickButton(armJoystick, closeIntakeButton).whenPressed(() -> intake.raise(), intake);
-
-    new JoystickButton(armJoystick, startShootButton)
-        .toggleWhenPressed(
-            superstructure.shoot(
-                () -> armJoystick.getRawButton(shootButton),
-                () -> armJoystick.getRawButton(ejectButton),
-                drivetrain));
-    new JoystickButton(armJoystick, startDummyShootButton)
-        .toggleWhenPressed(
-            superstructure.dummyShoot(
-                () -> armJoystick.getRawButton(shootButton),
-                () -> armJoystick.getRawButton(ejectButton)));
-
-    Command climbMode =
-        climber.ClimbMode(
-            () -> armJoystick.getRawAxis(climberMotorAxis) > ClimberConstants.DEADBAND,
-            () -> armJoystick.getRawAxis(climberMotorAxis) < -ClimberConstants.DEADBAND);
-    new JoystickButton(armJoystick, climberOpenButton)
-        .whenPressed(
-            () -> {
-              climber.open();
-              climbMode.schedule();
-            },
-            climber);
-    new JoystickButton(armJoystick, climberCloseButton)
-        .whenPressed(
-            () -> {
-              climber.close();
-              climbMode.cancel();
-            },
-            climber);
-
-    new JoystickButton(armJoystick, compressorToggle)
-        .toggleWhenPressed(
-            new StartEndCommand(
-                () -> compressor.setClosedLoopControl(false),
-                () -> compressor.setClosedLoopControl(true)));
-    CommandScheduler.getInstance()
-        .addButton(() -> SmartDashboard.putBoolean("compressor", compressor.enabled()));
-
-    var vision = superstructure.vision;
-    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
-    new POVButton(armJoystick, 180).whenPressed(() -> vision.goTo(TARGET, UP), vision);
+    bind(driveJoystick, armJoystick, drivetrain, superstructure, climber, compressor);
   }
 
   public void initSubsystemStates() {

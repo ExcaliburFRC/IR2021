@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.button.Button
 import edu.wpi.first.wpilibj2.command.button.JoystickButton
+import edu.wpi.first.wpilibj2.command.button.POVButton
 
 operator fun GenericHID.invoke(index: Int): JoystickButton = JoystickButton(this, index)
 
@@ -19,3 +20,7 @@ inline fun <T : SubsystemBase> Button.whenPressed(
     requirement: T,
     crossinline command: T.() -> Unit
 ): Button = whenPressed({ requirement.command() }, requirement)
+
+fun GenericHID.pov(angle: Int) = POVButton(this, angle)
+
+fun GenericHID.button(index: Int): () -> Boolean = { getRawButton(index) }
