@@ -6,14 +6,20 @@ import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.VecBuilder;
+import edu.wpi.first.wpiutil.math.numbers.N1;
 import io.excaliburfrc.lib.SimSparkMax;
 import io.excaliburfrc.robot.Constants.ShooterConstants;
 
@@ -26,6 +32,8 @@ public class Shooter extends SubsystemBase {
 
   private double target = 0.0;
   private double previousPosition = 0.0;
+
+  private LinearSystemLoop<N1, N1, N1> loop;
 
   private FlywheelSim flywheel;
   private EncoderSim simEncoder;
@@ -43,11 +51,22 @@ public class Shooter extends SubsystemBase {
     controller = new PIDController(kP, 0.0, 0.0, kTimestep);
     ff = new SimpleMotorFeedforward(kS, kV, kA);
 
+    var system = LinearSystemId.identifyVelocitySystem(ShooterConstants.kV, ShooterConstants.kA);
+    var kalman = new KalmanFilter<>(Nat.N1(),
+            Nat.N1(),
+            system,
+            VecBuilder.fill(3.0), // How accurate we think our model is
+            VecBuilder.fill(0.01), // How accurate we think our encoder
+            // data is
+            kTimestep);
+
+    var lqr = new LinearQuadraticRegulator<>(system, VecBuilder.fill(8.0), VecBuilder.fill(12.0), kTimestep);
+
+    loop = new LinearSystemLoop<>(system, lqr, kalman, 12, kTimestep);
+
     if (RobotBase.isSimulation()) {
       flywheel =
-          new FlywheelSim(
-              LinearSystemId.identifyVelocitySystem(ShooterConstants.kV, ShooterConstants.kA),
-              DCMotor.getNEO(1),
+          new FlywheelSim(system, DCMotor.getNEO(1),
               ShooterConstants.TICKS_TO_WHEEL_ROTATIONS);
       simEncoder = new EncoderSim(encoder);
     }
@@ -95,9 +114,15 @@ public class Shooter extends SubsystemBase {
     }
     if (!DriverStation.getInstance().isEnabled()) target = 0;
     if (Double.compare(target, 0.0) != 0) {
-      var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);
-      var feedforward = kF * (target);
-      output = pid + feedforward;
+      loop.setNextR(target);
+
+      loop.correct(VecBuilder.fill(velocity));
+      loop.predict(kTimestep);
+
+//      var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);
+//      var feedforward = kF * (target);
+//      output = pid + feedforward;
+      output = loop.getU(0) / 12.0;
     }
 
     shooterMotor.set(output);
@@ -107,6 +132,7 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("shooterVel", velocity);
     SmartDashboard.putNumber("target", target);
+    SmartDashboard.putNumber("output", output);
     SmartDashboard.putBoolean("isAtTargetVelocity", isAtTargetVelocity());
     SmartDashboard.putBoolean("isShooterActive", Double.compare(target, 0.0) != 0);
   }
