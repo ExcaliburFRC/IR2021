@@ -62,6 +62,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     stopTime = Timer.getFPGATimestamp();
     CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.isLimited.set(true);
   }
 
   @Override

@@ -23,6 +23,7 @@ import io.excaliburfrc.robot.commands.autonav.Slalum;
 import io.excaliburfrc.robot.subsystems.*;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -79,6 +80,8 @@ public class RobotContainer {
     return new ParallelDeadlineGroup(ramsete, in);
   }
 
+  final AtomicBoolean isLimited = new AtomicBoolean(true);
+
   @SuppressWarnings("Convert2MethodRef")
   private void configureButtonBindings() {
     // create `JoystickButton`s binding between the buttons and commands.
@@ -88,6 +91,9 @@ public class RobotContainer {
     // driverJoystick
     final int forwardDriveAxis = 1;
     final int rotateDriveAxis = 2;
+    final int slowButton = 1;
+    final int fastButton = 4;
+
 
     // armJoystick
     final int shootButton = 1;
@@ -102,11 +108,14 @@ public class RobotContainer {
     final int climberMotorAxis = 1;
     final int compressorToggle = 12;
 
+    new JoystickButton(driveJoystick, slowButton).whenPressed(()->isLimited.set(true));
+    new JoystickButton(driveJoystick, fastButton).whenPressed(()->isLimited.set(false));
+
     drivetrain.setDefaultCommand(
         new RunCommand(
             () ->
                 drivetrain.arcade(
-                    -driveJoystick.getRawAxis(forwardDriveAxis),
+                    -driveJoystick.getRawAxis(forwardDriveAxis) * (isLimited.get() ? 0.6 : 1),
                     driveJoystick.getRawAxis(rotateDriveAxis)),
             drivetrain));
 
