@@ -13,8 +13,8 @@ import io.excaliburfrc.robot.Constants;
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPipelineResult;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class Vision extends SubsystemBase {
   private final PhotonCamera limelight;

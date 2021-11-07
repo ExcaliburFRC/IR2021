@@ -46,9 +46,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     chooser.setDefaultOption("Nothing", new InstantCommand()); // for skills
-    chooser.addOption("Slalum", new Slalum(drivetrain));
-    chooser.addOption("Bounce", new Bounce(drivetrain));
-    chooser.addOption("Barrel", new Barrel(drivetrain));
+//    chooser.addOption("Slalum", new Slalum(drivetrain));
+//    chooser.addOption("Bounce", new Bounce(drivetrain));
+//    chooser.addOption("Barrel", new Barrel(drivetrain));
     // for competition
     // go 1 meter forward, and then shoot
     var competition =
@@ -65,8 +65,8 @@ public class RobotContainer {
                         () -> superstructure.vision.goTo(TARGET, UP), superstructure.vision)))
             .andThen(superstructure.shoot(() -> true, () -> false, drivetrain));
     chooser.addOption("Competition", competition);
-    chooser.addOption("GalacticSearch", galacticSearch());
-    SmartDashboard.putData("Auto", chooser); // for skills only
+//    chooser.addOption("GalacticSearch", galacticSearch());
+//    SmartDashboard.putData("Auto", chooser); // for skills only
     // Configure the button bindings
     configureButtonBindings();
     initSubsystemStates();

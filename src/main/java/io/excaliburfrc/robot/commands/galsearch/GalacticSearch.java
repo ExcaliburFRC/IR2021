@@ -15,8 +15,8 @@ import io.excaliburfrc.robot.subsystems.Vision;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.photonvision.PhotonPipelineResult;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class GalacticSearch {
   static final Pose2d origin = new Pose2d();
