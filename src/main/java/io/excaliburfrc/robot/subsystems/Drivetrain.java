@@ -10,7 +10,6 @@ import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.controller.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -23,6 +22,9 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.lib.*;
+import io.excaliburfrc.lib.SimpleMotorFeedforward;
+import io.excaliburfrc.robot.commands.TrajectoryCommand;
+
 import java.util.function.DoubleSupplier;
 
 public class Drivetrain extends SubsystemBase {
@@ -38,6 +40,8 @@ public class Drivetrain extends SubsystemBase {
   private final DifferentialDriveOdometry odometry;
   private final CANPIDController leftController;
   private final CANPIDController rightController;
+  private final RamseteController m_ramseteController = new RamseteController();
+  private final DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(TRACK_WIDTH);
 
   private SimDouble simGyro;
   private CANEncoderSim simLeftEncoder;
@@ -46,6 +50,9 @@ public class Drivetrain extends SubsystemBase {
   private final Field2d field;
   private final SimpleMotorFeedforward velFF = new SimpleMotorFeedforward(kS, kV_lin, kA_lin);
   private final PIDController angleController;
+  private PIDController m_leftController = new PIDController(kP, 0, 0);
+  private PIDController m_rightController = new PIDController(kP, 0, 0);
+  private double kTimestepSeconds = 0.02;
 
   public Drivetrain() {
     rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -173,14 +180,13 @@ public class Drivetrain extends SubsystemBase {
   public RamseteCommand ramsete(Trajectory path) {
     return new RamseteCommand(
         path,
-        () -> odometry.getPoseMeters(),
-        new RamseteController(),
+        odometry::getPoseMeters,
+            m_ramseteController,
         velFF,
-        new DifferentialDriveKinematics(TRACK_WIDTH),
-        () ->
-            new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()),
-        new PIDController(kP, 0, 0),
-        new PIDController(kP, 0, 0),
+            m_kinematics,
+        () -> new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()),
+            m_leftController,
+            m_rightController,
         (left, right) -> {
           leftLeader.setVoltage(left);
           rightLeader.setVoltage(right);
@@ -195,6 +201,52 @@ public class Drivetrain extends SubsystemBase {
     odometry.resetPosition(pose, gyro.getRotation2d());
     // simDrive.setPose(pose);
     field.setRobotPose(pose);
+  }
+
+  // Track previous target velocities for feedforward calculation
+  private DifferentialDriveWheelSpeeds m_previousSpeeds = new DifferentialDriveWheelSpeeds();
+
+  private void followState(Trajectory.State targetState) {
+    // Calculate via Ramsete the speed vector needed to reach the target state
+    ChassisSpeeds speedVector =
+            m_ramseteController.calculate(odometry.getPoseMeters(), targetState);
+    // Convert the vector to the separate velocities of each side of the drivetrain
+    DifferentialDriveWheelSpeeds targetSpeeds =
+            m_kinematics.toWheelSpeeds(speedVector);
+
+    // PID and Feedforward control
+    // This can be replaced by calls to smart motor controller closed-loop control
+    // functionality. For example:
+    // mySmartMotorController.setSetpoint(leftMetersPerSecond, ControlType.Velocity);
+
+    double leftFeedforward =
+            velFF.calculate(
+                    m_previousSpeeds.leftMetersPerSecond,
+                    targetSpeeds.leftMetersPerSecond,
+                    kTimestepSeconds);
+
+    double rightFeedforward =
+            velFF.calculate(
+                    m_previousSpeeds.rightMetersPerSecond,
+                    targetSpeeds.rightMetersPerSecond,
+                    kTimestepSeconds);
+
+    double leftOutput =
+            leftFeedforward
+            + m_leftController.calculate(leftEncoder.getVelocity(), targetSpeeds.leftMetersPerSecond);
+
+    double rightOutput =
+            rightFeedforward
+            + m_rightController.calculate(
+                    rightEncoder.getVelocity(), targetSpeeds.rightMetersPerSecond);
+
+    // Apply the voltages
+    leftLeader.setVoltage(leftOutput);
+    rightLeader.setVoltage(rightOutput);
+    drive.feed();
+
+    // Track previous speed setpoints
+    m_previousSpeeds = targetSpeeds;
   }
 
   public void resetPose() {
@@ -218,5 +270,18 @@ public class Drivetrain extends SubsystemBase {
 
   public boolean isAtTargetAngle() {
     return angleController.atSetpoint();
+  }
+
+  public Command buildTrajectoryGroup(Trajectory trajectory) {
+    return new TrajectoryCommand(trajectory, this::followState, this)
+            // Reset odometry to the starting pose of the trajectory.
+            .beforeStarting(() -> resetPose(trajectory.getInitialPose()), this)
+            // Stop at the end of the trajectory.
+            .andThen(
+                    () -> {
+                      m_previousSpeeds = new DifferentialDriveWheelSpeeds();
+                      drive.stopMotor();
+                    },
+                    this);
   }
 }
