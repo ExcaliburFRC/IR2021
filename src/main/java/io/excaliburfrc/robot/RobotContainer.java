@@ -17,9 +17,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import io.excaliburfrc.robot.Constants.ClimberConstants;
-import io.excaliburfrc.robot.commands.autonav.Barrel;
-import io.excaliburfrc.robot.commands.autonav.Bounce;
-import io.excaliburfrc.robot.commands.autonav.Slalum;
 import io.excaliburfrc.robot.subsystems.*;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.List;
@@ -47,9 +44,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     chooser.setDefaultOption("Nothing", new InstantCommand()); // for skills
-//    chooser.addOption("Slalum", new Slalum(drivetrain));
-//    chooser.addOption("Bounce", new Bounce(drivetrain));
-//    chooser.addOption("Barrel", new Barrel(drivetrain));
+    //    chooser.addOption("Slalum", new Slalum(drivetrain));
+    //    chooser.addOption("Bounce", new Bounce(drivetrain));
+    //    chooser.addOption("Barrel", new Barrel(drivetrain));
     // for competition
     // go 1 meter forward, and then shoot
     var competition =
@@ -66,8 +63,8 @@ public class RobotContainer {
                         () -> superstructure.vision.goTo(TARGET, UP), superstructure.vision)))
             .andThen(superstructure.shoot(() -> true, () -> false, drivetrain));
     chooser.addOption("Competition", competition);
-//    chooser.addOption("GalacticSearch", galacticSearch());
-//    SmartDashboard.putData("Auto", chooser); // for skills only
+    //    chooser.addOption("GalacticSearch", galacticSearch());
+    //    SmartDashboard.putData("Auto", chooser); // for skills only
     // Configure the button bindings
     configureButtonBindings();
     initSubsystemStates();
@@ -94,7 +91,6 @@ public class RobotContainer {
     final int slowButton = 1;
     final int fastButton = 4;
 
-
     // armJoystick
     final int shootButton = 1;
     final int inButton = 2;
@@ -108,15 +104,16 @@ public class RobotContainer {
     final int climberMotorAxis = 1;
     final int compressorToggle = 12;
 
-    new JoystickButton(driveJoystick, slowButton).whenPressed(()->isLimited.set(true));
-    new JoystickButton(driveJoystick, fastButton).whenPressed(()->isLimited.set(false));
+    new JoystickButton(driveJoystick, slowButton).whenPressed(() -> isLimited.set(true));
+    new JoystickButton(driveJoystick, fastButton).whenPressed(() -> isLimited.set(false));
 
     drivetrain.setDefaultCommand(
         new RunCommand(
             () ->
-                drivetrain.arcade(
+                drivetrain.curvature(
                     -driveJoystick.getRawAxis(forwardDriveAxis) * (isLimited.get() ? 0.6 : 1),
-                    driveJoystick.getRawAxis(rotateDriveAxis)),
+                    driveJoystick.getRawAxis(rotateDriveAxis),
+                    driveJoystick.getRawButton(6)),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)

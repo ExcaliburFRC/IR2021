@@ -60,7 +60,7 @@ public class Drivetrain extends SubsystemBase {
     rightLeader.setInverted(true);
     leftFollower.follow(leftLeader);
     rightFollower.follow(rightLeader);
-    setIdleMode(CANSparkMax.IdleMode.kCoast);
+    setIdleMode(CANSparkMax.IdleMode.kBrake);
     leftLeader.enableVoltageCompensation(12);
     leftFollower.enableVoltageCompensation(12);
     rightLeader.enableVoltageCompensation(12);
@@ -153,6 +153,10 @@ public class Drivetrain extends SubsystemBase {
 
   public void arcade(double x, double r) {
     drive.arcadeDrive(x, r);
+  }
+
+  public void curvature(double x, double r, boolean isQuick) {
+    drive.curvatureDrive(x, r, isQuick);
   }
 
   public Command ramseteGroup(Trajectory path) {
