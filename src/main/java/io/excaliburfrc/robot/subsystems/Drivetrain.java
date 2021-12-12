@@ -7,20 +7,22 @@ import com.revrobotics.*;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.controller.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.*;
 import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.lib.*;
 import java.util.function.DoubleSupplier;
@@ -30,14 +32,14 @@ public class Drivetrain extends SubsystemBase {
   private final CANSparkMax rightFollower;
   private final CANSparkMax leftLeader;
   private final CANSparkMax leftFollower;
-  private final CANEncoder leftEncoder;
-  private final CANEncoder rightEncoder;
+  private final RelativeEncoder leftEncoder;
+  private final RelativeEncoder rightEncoder;
   private final AHRS gyro;
 
   private final DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
-  private final CANPIDController leftController;
-  private final CANPIDController rightController;
+  private final SparkMaxPIDController leftController;
+  private final SparkMaxPIDController rightController;
 
   private SimDouble simGyro;
   private CANEncoderSim simLeftEncoder;
@@ -48,10 +50,10 @@ public class Drivetrain extends SubsystemBase {
   private final PIDController angleController;
 
   public Drivetrain() {
-    rightLeader = new SimSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    leftLeader = new SimSparkMax(LEFT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    leftFollower = new SimSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    rightFollower = new SimSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    rightLeader = new CANSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    leftLeader = new CANSparkMax(LEFT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    leftFollower = new CANSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    rightFollower = new CANSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
 
     leftLeader.restoreFactoryDefaults();
     rightLeader.restoreFactoryDefaults();
@@ -88,7 +90,6 @@ public class Drivetrain extends SubsystemBase {
     gyro = new AHRS(SPI.Port.kMXP);
 
     drive = new DifferentialDrive(leftLeader, rightLeader);
-    drive.setRightSideInverted(false);
     drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();

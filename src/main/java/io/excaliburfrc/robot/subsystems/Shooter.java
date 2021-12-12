@@ -1,21 +1,24 @@
 package io.excaliburfrc.robot.subsystems;
 
-import static io.excaliburfrc.robot.Constants.ShooterConstants.*;
-
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.simulation.*;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
-import io.excaliburfrc.lib.SimSparkMax;
 import io.excaliburfrc.robot.Constants.ShooterConstants;
+
+import static io.excaliburfrc.robot.Constants.ShooterConstants.*;
 
 public class Shooter extends SubsystemBase {
   private final CANSparkMax shooterMotor;
@@ -32,7 +35,7 @@ public class Shooter extends SubsystemBase {
   private double velocity = 0;
 
   public Shooter() {
-    shooterMotor = new SimSparkMax(SHOOTER_ID, MotorType.kBrushless);
+    shooterMotor = new CANSparkMax(SHOOTER_ID, MotorType.kBrushless);
     shooterMotor.restoreFactoryDefaults();
     shooterMotor.setIdleMode(IdleMode.kCoast);
     shooterMotor.enableVoltageCompensation(12);
@@ -93,7 +96,7 @@ public class Shooter extends SubsystemBase {
     if (target < 0) { // this never happened in comp - it's safe!
       throw new AssertionError("shooter target velocity should not be negative");
     }
-    if (!DriverStation.getInstance().isEnabled()) target = 0;
+    if (!DriverStation.isEnabled()) target = 0;
     if (Double.compare(target, 0.0) != 0) {
       var pid = MathUtil.clamp(controller.calculate(velocity, target), 0.0, 1.0);
       var feedforward = kF * (target);

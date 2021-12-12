@@ -6,13 +6,13 @@ import static io.excaliburfrc.robot.subsystems.Vision.Mode.DRIVER;
 import static io.excaliburfrc.robot.subsystems.Vision.Mode.TARGET;
 
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -37,9 +37,9 @@ public class RobotContainer {
 
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
-  private final Joystick driveJoystick = new Joystick(0);
+  private final PS4Controller driveJoystick = new PS4Controller(0);
   private final Joystick armJoystick = new Joystick(1);
-  private final Compressor compressor = new Compressor();
+  private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -50,7 +50,7 @@ public class RobotContainer {
     // for competition
     // go 1 meter forward, and then shoot
     var competition =
-        (new SelectCommand(
+        new SelectCommand(
                     () ->
                         drivetrain.ramseteGroup(
                             TrajectoryGenerator.generateTrajectory(
@@ -58,9 +58,9 @@ public class RobotContainer {
                                     new Pose2d(0, 0, new Rotation2d(0)),
                                     new Pose2d(0.6, 0, Rotation2d.fromDegrees(0))),
                                 new TrajectoryConfig(3, 3))))
-                .alongWith(
-                    new InstantCommand(
-                        () -> superstructure.vision.goTo(TARGET, UP), superstructure.vision)))
+//                .alongWith(
+//                    new InstantCommand(
+//                        () -> superstructure.vision.goTo(TARGET, UP), superstructure.vision)))
             .andThen(superstructure.shoot(() -> true, () -> false, drivetrain));
     chooser.addOption("Competition", competition);
     //    chooser.addOption("GalacticSearch", galacticSearch());
@@ -111,9 +111,9 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 drivetrain.curvature(
-                    -driveJoystick.getRawAxis(forwardDriveAxis) * (isLimited.get() ? 0.6 : 1),
-                    driveJoystick.getRawAxis(rotateDriveAxis),
-                    driveJoystick.getRawButton(6)),
+                    -driveJoystick.getLeftY() * (isLimited.get() ? 0.6 : 1),
+                    driveJoystick.getLeftX(),
+                    driveJoystick.getRawButton(PS4Controller.Button.kR1.value)),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)
@@ -161,14 +161,14 @@ public class RobotContainer {
     new JoystickButton(armJoystick, compressorToggle)
         .toggleWhenPressed(
             new StartEndCommand(
-                () -> compressor.setClosedLoopControl(false),
-                () -> compressor.setClosedLoopControl(true)));
+                () -> compressor.disable(),
+                () -> compressor.enableDigital()));
     CommandScheduler.getInstance()
         .addButton(() -> SmartDashboard.putBoolean("compressor", compressor.enabled()));
 
-    var vision = superstructure.vision;
-    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
-    new POVButton(armJoystick, 180).whenPressed(() -> vision.goTo(TARGET, UP), vision);
+//    var vision = superstructure.vision;
+//    new POVButton(armJoystick, 0).whenPressed(() -> vision.goTo(DRIVER, FORWARD), vision);
+//    new POVButton(armJoystick, 180).whenPressed(() -> vision.goTo(TARGET, UP), vision);
   }
 
   public void initSubsystemStates() {

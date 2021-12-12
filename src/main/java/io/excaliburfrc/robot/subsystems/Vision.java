@@ -3,11 +3,12 @@ package io.excaliburfrc.robot.subsystems;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.excaliburfrc.robot.Constants;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class Vision extends SubsystemBase {
 
   public Vision() {
     limelight = new PhotonCamera("limelight");
-    lifter = new DoubleSolenoid(Constants.LL_REV, Constants.LL_FWD);
+    lifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.LL_REV, Constants.LL_FWD);
   }
 
   public void goTo(Mode mode, CameraPosition position) {

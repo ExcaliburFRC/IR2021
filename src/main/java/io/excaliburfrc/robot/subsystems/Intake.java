@@ -4,6 +4,7 @@ import static io.excaliburfrc.robot.Constants.IntakeConstants.*;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
@@ -12,7 +13,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public Intake() {
     intakeMotor = new WPI_VictorSPX(INTAKE_MOTOR_ID);
-    piston = new DoubleSolenoid(FORWARD_CHANNEL, REVERSE_CHANNEL);
+    piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, FORWARD_CHANNEL, REVERSE_CHANNEL);
   }
 
   @Override

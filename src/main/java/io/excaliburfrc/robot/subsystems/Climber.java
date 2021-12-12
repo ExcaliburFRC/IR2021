@@ -5,6 +5,7 @@ import static io.excaliburfrc.robot.Constants.ClimberConstants.*;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.robot.subsystems.LEDs.LedMode;
 import java.util.function.BooleanSupplier;
@@ -17,7 +18,7 @@ public class Climber extends SubsystemBase {
   public Climber() {
     leader = new WPI_TalonSRX(LEADER_ID);
     follower = new WPI_TalonSRX(FOLLOWER_ID);
-    hanger = new DoubleSolenoid(HANGER_FWD, HANGER_REV);
+    hanger = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, HANGER_FWD, HANGER_REV);
     leader.setInverted(true);
     follower.follow(leader);
     follower.setInverted(InvertType.OpposeMaster);

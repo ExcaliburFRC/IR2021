@@ -1,8 +1,9 @@
 package io.excaliburfrc.robot.commands.autonav;
 
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.trajectory.*;
 import edu.wpi.first.wpilibj2.command.*;
 import io.excaliburfrc.robot.subsystems.Drivetrain;
 import java.io.IOException;

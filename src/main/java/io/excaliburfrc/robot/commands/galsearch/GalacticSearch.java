@@ -1,17 +1,18 @@
 package io.excaliburfrc.robot.commands.galsearch;
 
 import edu.wpi.first.hal.simulation.SimulatorJNI;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.util.Units;
 import io.excaliburfrc.robot.subsystems.Vision;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,7 +53,6 @@ public class GalacticSearch {
     Field2d field = new Field2d();
 
     public SimulationManager() {
-      SimulatorJNI.registerSimPeriodicBeforeCallback(this);
       chooser.setDefaultOption("nothing", null);
       chooser.addOption("RedA", generate(convert(RedA)));
       chooser.addOption("RedB", generate(convert(RedB)));
