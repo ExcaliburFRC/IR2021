@@ -110,10 +110,11 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         new RunCommand(
             () ->
-                drivetrain.curvature(
-                    -driveJoystick.getLeftY() * (isLimited.get() ? 0.6 : 1),
-                    driveJoystick.getLeftX(),
-                    driveJoystick.getRawButton(PS4Controller.Button.kR1.value)),
+                drivetrain.arcade(
+                    armJoystick.getY() * 0.5,
+                    -armJoystick.getX()//,
+//                    driveJoystick.getRawButton(PS4Controller.Button.kR1.value)
+                ),
             drivetrain));
 
     new JoystickButton(armJoystick, inButton)

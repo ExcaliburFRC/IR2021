@@ -20,6 +20,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,18 +30,22 @@ import io.excaliburfrc.lib.*;
 import java.util.function.DoubleSupplier;
 
 public class Drivetrain extends SubsystemBase {
-  private final CANSparkMax rightLeader;
-  private final CANSparkMax rightFollower;
-  private final CANSparkMax leftLeader;
-  private final CANSparkMax leftFollower;
-  private final RelativeEncoder leftEncoder;
-  private final RelativeEncoder rightEncoder;
+  private final PWMSparkMax rightLeader;
+  private final PWMSparkMax rightFollower;
+  private final PWMSparkMax leftLeader;
+  private final PWMSparkMax leftFollower;
+  //private final RelativeEncoder leftEncoder;
+  //private final RelativeEncoder rightEncoder;
   private final AHRS gyro;
 
   private final DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
-  private final SparkMaxPIDController leftController;
-  private final SparkMaxPIDController rightController;
+  //private final SparkMaxPIDController leftController;
+  //private final SparkMaxPIDController rightController;
+
+  private final MotorControllerGroup right;
+  private final MotorControllerGroup left;
+
 
   private SimDouble simGyro;
   private CANEncoderSim simLeftEncoder;
@@ -50,24 +56,28 @@ public class Drivetrain extends SubsystemBase {
   private final PIDController angleController;
 
   public Drivetrain() {
-    rightLeader = new CANSparkMax(RIGHT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    leftLeader = new CANSparkMax(LEFT_LEADER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    leftFollower = new CANSparkMax(LEFT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-    rightFollower = new CANSparkMax(RIGHT_FOLLOWER_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    rightLeader = new PWMSparkMax(2);
+    leftLeader = new PWMSparkMax(0);
+    leftFollower = new PWMSparkMax(9);
+    rightFollower = new PWMSparkMax(5);
 
-    leftLeader.restoreFactoryDefaults();
-    rightLeader.restoreFactoryDefaults();
-    leftFollower.restoreFactoryDefaults();
-    rightFollower.restoreFactoryDefaults();
-    rightLeader.setInverted(true);
-    leftFollower.follow(leftLeader);
-    rightFollower.follow(rightLeader);
+    right = new MotorControllerGroup(rightLeader, rightFollower);
+//    right.setInverted(true);
+    left = new MotorControllerGroup(leftLeader, leftFollower);
+    left.setInverted(true);
+    //leftLeader.restoreFactoryDefaults();
+    //rightLeader.restoreFactoryDefaults();
+    //leftFollower.restoreFactoryDefaults();
+    //rightFollower.restoreFactoryDefaults();
+//    rightLeader.setInverted(true);
+    //leftFollower.follow(leftLeader);
+    //rightFollower.follow(rightLeader);
     setIdleMode(CANSparkMax.IdleMode.kBrake);
-    leftLeader.enableVoltageCompensation(12);
-    leftFollower.enableVoltageCompensation(12);
-    rightLeader.enableVoltageCompensation(12);
-    rightFollower.enableVoltageCompensation(12);
-
+    //leftLeader.enableVoltageCompensation(12);
+    //leftFollower.enableVoltageCompensation(12);
+    //rightLeader.enableVoltageCompensation(12);
+    //rightFollower.enableVoltageCompensation(12);
+/*
     leftEncoder = leftLeader.getEncoder();
     rightEncoder = rightLeader.getEncoder();
 
@@ -86,10 +96,10 @@ public class Drivetrain extends SubsystemBase {
     rightController.setI(0);
     rightController.setD(0);
     rightController.setFF(0);
-
+*/
     gyro = new AHRS(SPI.Port.kMXP);
 
-    drive = new DifferentialDrive(leftLeader, rightLeader);
+    drive = new DifferentialDrive(left, right);
     drive.setSafetyEnabled(false);
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
     field = new Field2d();
@@ -113,14 +123,15 @@ public class Drivetrain extends SubsystemBase {
 
     angleController = new PIDController(kP_ang, 0, 0);
     angleController.setTolerance(ANGLE_TOLERANCE);
+
   }
 
   public void setIdleMode(CANSparkMax.IdleMode idleMode) {
-    leftLeader.setIdleMode(idleMode);
+    /*leftLeader.setIdleMode(idleMode);
     leftFollower.setIdleMode(idleMode);
     rightLeader.setIdleMode(idleMode);
     rightFollower.setIdleMode(idleMode);
-  }
+  */}
 
   @Override
   public void simulationPeriodic() {
@@ -141,7 +152,7 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     //    SmartDashboard.putNumber("gyro", gyro.getAngle());
-    odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    //odometry.update(gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
     field.setRobotPose(odometry.getPoseMeters());
     SmartDashboard.putData("Field", field);
     //    SmartDashboard.putNumber("RightEncoder", rightEncoder.getVelocity());
@@ -183,7 +194,7 @@ public class Drivetrain extends SubsystemBase {
         velFF,
         new DifferentialDriveKinematics(TRACK_WIDTH),
         () ->
-            new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()),
+            new DifferentialDriveWheelSpeeds(0,0),//leftEncoder.getVelocity(), rightEncoder.getVelocity()),
         new PIDController(kP, 0, 0),
         new PIDController(kP, 0, 0),
         (left, right) -> {
@@ -194,9 +205,10 @@ public class Drivetrain extends SubsystemBase {
         this);
   }
 
+
   public void resetPose(Pose2d pose) {
-    leftEncoder.setPosition(0);
-    rightEncoder.setPosition(0);
+   // leftEncoder.setPosition(0);
+  //  rightEncoder.setPosition(0);
     odometry.resetPosition(pose, gyro.getRotation2d());
     // simDrive.setPose(pose);
     field.setRobotPose(pose);
